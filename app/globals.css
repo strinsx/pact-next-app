@@ -10,6 +10,8 @@
   --color-foreground: var(--foreground);
   --color-primary: #1f2a5a;
   --color-secondary: #4a90f5;
+  --color-teal: #56d9c8;
+  --color-purple: #a37af7;
   --color-muted: #5c6b8a;
   --color-border: #e4e7f5;
   --color-surface: #ffffff;
@@ -30,4 +32,27 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-poppins), Arial, Helvetica, sans-serif;
+}
+
+.feed-scroll {
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-secondary) transparent;
+}
+
+.feed-scroll::-webkit-scrollbar {
+  width: 8px;
+}
+
+.feed-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.feed-scroll::-webkit-scrollbar-thumb {
+  background: var(--color-secondary);
+  border-radius: 9999px;
+}
+
+.feed-scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--color-purple);
 }
