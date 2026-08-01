@@ -14,14 +14,28 @@ function getWeekLabels(): string[] {
   if (cachedLabels) return cachedLabels;
 
   const now = new Date();
-  const year = now.getFullYear();
-  const month = now.getMonth();
-  const days = [1, 8, 15, now.getDate()];
+  const diffToMonday = (now.getDay() + 6) % 7;
+  const thisMonday = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate() - diffToMonday
+  );
 
-  cachedLabels = days.map((day) => {
-    const d = new Date(year, month, day);
-    const monthName = d.toLocaleString("en", { month: "short" });
-    return `${monthName} ${d.getDate()}`;
+  const fmt = (d: Date) =>
+    d.toLocaleString("en", { month: "short", day: "numeric" });
+
+  cachedLabels = [3, 2, 1, 0].map((offset) => {
+    const monday = new Date(
+      thisMonday.getFullYear(),
+      thisMonday.getMonth(),
+      thisMonday.getDate() - offset * 7
+    );
+    const sunday = new Date(
+      monday.getFullYear(),
+      monday.getMonth(),
+      monday.getDate() + 6
+    );
+    return `${fmt(monday)} – ${fmt(sunday)}`;
   });
 
   return cachedLabels;
@@ -30,9 +44,9 @@ function getWeekLabels(): string[] {
 export default function WeeklyConsistencyCard() {
   const labels = useSyncExternalStore(emptySubscribe, getWeekLabels, () => []);
 
-  const weeklyData = values.map((value, i) => ({
-    label: labels[i] ?? "",
-    value,
+  const weeklyData = labels.map((label, i) => ({
+    label,
+    value: values[i] ?? 0,
   }));
 
   return (
