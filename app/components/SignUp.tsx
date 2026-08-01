@@ -2,19 +2,73 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import {
-  faUser,
-  faEnvelope,
-  faLock,
-  faEye,
-  faEyeSlash,
-} from "@fortawesome/free-solid-svg-icons";
+import { User, Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
+import { createClient } from "@/app/lib/supabase/client";
 
 export default function SignUp() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setError(null);
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+
+    setLoading(true);
+    const supabase = createClient();
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: { full_name: fullName },
+      },
+    });
+
+    if (error) {
+      setError(error.message);
+      setLoading(false);
+      return;
+    }
+
+    if (data.user) {
+      const { error: profileError } = await supabase.from("profiles").insert({
+        id: crypto.randomUUID(),
+        user_id: data.user.id,
+        full_name: fullName,
+      });
+      setLoading(false);
+
+      if (profileError) {
+        setError(profileError.message);
+        return;
+      }
+    } else {
+      setLoading(false);
+    }
+
+    window.location.href = "/auth/onboarding";
+  };
+
+  const handleGoogleSignUp = async () => {
+    const supabase = createClient();
+    await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
+    });
+  };
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center px-4">
@@ -24,18 +78,28 @@ export default function SignUp() {
       <p className="mt-2 font-poppins text-sm font-semibold text-muted">
         Create Your Accountability Group
       </p>
-      <div className="mt-8 flex w-full max-w-md flex-col gap-5 rounded-2xl border-1 border-border bg-surface p-8">
+      <form
+        onSubmit={handleSignUp}
+        className="mt-8 flex w-full max-w-md flex-col gap-5 rounded-2xl border-1 border-border bg-surface p-8"
+      >
+        {error && (
+          <p className="rounded-lg border-1 border-red-500/30 bg-red-500/10 px-3 py-2 font-nunito text-sm text-red-500">
+            {error}
+          </p>
+        )}
         <h2 className="font-poppins text-sm font-light text-secondary">
           Full Name
         </h2>
         <div className="relative mx-2">
-          <FontAwesomeIcon
-            icon={faUser}
+          <User
             className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted/20"
           />
           <input
             type="text"
             placeholder="John Doe"
+            value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
+            required
             className="w-full rounded-xl border-1 border-border bg-transparent py-1 pl-11 pr-4 font-nunito text-sm text-primary shadow-sm placeholder:text-muted focus:outline-none"
           />
         </div>
@@ -43,13 +107,15 @@ export default function SignUp() {
           Email Address
         </h2>
         <div className="relative mx-2">
-          <FontAwesomeIcon
-            icon={faEnvelope}
+          <Mail
             className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted/20"
           />
           <input
             type="email"
             placeholder="you@example.com"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
             className="w-full rounded-xl border-1 border-border bg-transparent py-1 pl-11 pr-4 font-nunito text-sm text-primary shadow-sm placeholder:text-muted focus:outline-none"
           />
         </div>
@@ -57,13 +123,15 @@ export default function SignUp() {
           Password
         </h2>
         <div className="relative mx-2">
-          <FontAwesomeIcon
-            icon={faLock}
+          <Lock
             className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted/20"
           />
           <input
             type={showPassword ? "text" : "password"}
             placeholder="Password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            required
             className="w-full rounded-xl border-1 border-border bg-transparent py-1 pl-11 pr-11 font-nunito text-sm text-primary shadow-sm placeholder:text-muted focus:outline-none"
           />
           <button
@@ -71,23 +139,22 @@ export default function SignUp() {
             onClick={() => setShowPassword(!showPassword)}
             className="absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer text-muted/30"
           >
-            <FontAwesomeIcon
-              icon={showPassword ? faEyeSlash : faEye}
-              className="h-4 w-4"
-            />
+            {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
           </button>
         </div>
         <h2 className="font-poppins text-sm font-light text-secondary">
           Confirm Password
         </h2>
         <div className="relative mx-2">
-          <FontAwesomeIcon
-            icon={faLock}
+          <Lock
             className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-muted/20"
           />
           <input
             type={showConfirmPassword ? "text" : "password"}
             placeholder="Confirm Password"
+            value={confirmPassword}
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            required
             className="w-full rounded-xl border-1 border-border bg-transparent py-1 pl-11 pr-11 font-nunito text-sm text-primary shadow-sm placeholder:text-muted focus:outline-none"
           />
           <button
@@ -95,17 +162,15 @@ export default function SignUp() {
             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
             className="absolute right-4 top-1/2 -translate-y-1/2 cursor-pointer text-muted/30"
           >
-            <FontAwesomeIcon
-              icon={showConfirmPassword ? faEyeSlash : faEye}
-              className="h-4 w-4"
-            />
+            {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
           </button>
         </div>
         <button
           type="submit"
-          className="mt-2 w-full cursor-pointer rounded-xl bg-secondary py-1 font-nunito font-bold text-md text-white"
+          disabled={loading}
+          className="mt-2 w-full cursor-pointer rounded-xl bg-secondary py-1 font-nunito font-bold text-md text-white disabled:cursor-not-allowed disabled:opacity-60"
         >
-          Sign Up
+          {loading ? "Signing Up..." : "Sign Up"}
         </button>
         <div className="flex items-center gap-3">
           <div className="h-px flex-1 bg-border" />
@@ -114,6 +179,7 @@ export default function SignUp() {
         </div>
         <button
           type="button"
+          onClick={handleGoogleSignUp}
           className="w-full cursor-pointer rounded-xl border-1 border-border bg-transparent py-1 font-nunito font-bold text-md text-primary shadow-sm"
         >
           <Image
@@ -125,7 +191,7 @@ export default function SignUp() {
           />
           Continue with Google
         </button>
-      </div>
+      </form>
       <p className="mt-6 font-nunito text-sm text-muted/50">
         Already have an account?{" "}
         <Link href="/auth/login" className="font-bold text-primary">
