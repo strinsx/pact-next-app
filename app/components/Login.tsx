@@ -4,8 +4,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { Mail, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
 import { useState } from "react";
-import { createClient } from "@/app/lib/supabase/client";
-import { getPostAuthDestination } from "@/app/lib/auth/redirect";
+import {
+  signInWithEmail,
+  signInWithGoogle,
+  getPostAuthDestination,
+} from "@/app/lib/services/auth";
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
@@ -19,11 +22,7 @@ export default function Login() {
     setError(null);
     setLoading(true);
 
-    const supabase = createClient();
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    const { data, error } = await signInWithEmail(email, password);
     setLoading(false);
 
     if (error) {
@@ -41,13 +40,7 @@ export default function Login() {
   };
 
   const handleGoogleSignIn = async () => {
-    const supabase = createClient();
-    await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-      },
-    });
+    await signInWithGoogle();
   };
 
   return (

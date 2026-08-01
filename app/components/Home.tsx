@@ -8,7 +8,8 @@ import MonthlyAnalysisCard from "@/app/components/MonthlyAnalysisCard";
 import WeeklyAnalysisCard from "@/app/components/WeeklyAnalysisCard";
 import GroupFeedCard from "@/app/components/GroupFeedCard";
 import GroupRankingCard from "@/app/components/GroupRankingCard";
-import { createClient } from "@/app/lib/supabase/client";
+import { getCurrentUser } from "@/app/lib/services/auth";
+import { getProfileByUserId } from "@/app/lib/services/profile";
 
 export default function Home() {
   const router = useRouter();
@@ -18,24 +19,19 @@ export default function Home() {
 
   useEffect(() => {
     const loadUser = async () => {
-      const supabase = createClient();
-      const { data, error } = await supabase.auth.getUser();
+      const user = await getCurrentUser();
 
-      if (error || !data.user) {
+      if (!user) {
         router.push("/auth/login");
         return;
       }
 
-      const fullName = data.user.user_metadata?.full_name as string | undefined;
+      const fullName = user.user_metadata?.full_name as string | undefined;
       if (fullName) {
         setFirstName(fullName.trim().split(/\s+/)[0] || "there");
       }
 
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("username")
-        .eq("user_id", data.user.id)
-        .maybeSingle();
+      const { data: profile } = await getProfileByUserId(user.id, "username");
 
       if (!profile?.username) {
         router.push("/auth/onboarding");

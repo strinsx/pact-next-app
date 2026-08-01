@@ -2,9 +2,10 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { User, Mail, Lock, Eye, EyeOff } from "lucide-react";
+import { User, Mail, Lock, Eye, EyeOff, ArrowRight } from "lucide-react";
 import { useState } from "react";
-import { createClient } from "@/app/lib/supabase/client";
+import { signUpWithEmail, signInWithGoogle } from "@/app/lib/services/auth";
+import { createProfile } from "@/app/lib/services/profile";
 
 export default function SignUp() {
   const [showPassword, setShowPassword] = useState(false);
@@ -26,14 +27,7 @@ export default function SignUp() {
     }
 
     setLoading(true);
-    const supabase = createClient();
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: { full_name: fullName },
-      },
-    });
+    const { data, error } = await signUpWithEmail(email, password, fullName);
 
     if (error) {
       setError(error.message);
@@ -42,11 +36,10 @@ export default function SignUp() {
     }
 
     if (data.user) {
-      const { error: profileError } = await supabase.from("profiles").insert({
-        id: crypto.randomUUID(),
-        user_id: data.user.id,
-        full_name: fullName,
-      });
+      const { error: profileError } = await createProfile(
+        data.user.id,
+        fullName
+      );
       setLoading(false);
 
       if (profileError) {
@@ -61,13 +54,7 @@ export default function SignUp() {
   };
 
   const handleGoogleSignUp = async () => {
-    const supabase = createClient();
-    await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-      },
-    });
+    await signInWithGoogle();
   };
 
   return (
@@ -168,8 +155,9 @@ export default function SignUp() {
         <button
           type="submit"
           disabled={loading}
-          className="mt-2 w-full cursor-pointer rounded-xl bg-secondary py-1 font-nunito font-bold text-md text-white disabled:cursor-not-allowed disabled:opacity-60"
+          className="mt-2 flex w-full cursor-pointer items-center justify-center gap-2 rounded-xl bg-secondary py-1 font-nunito font-bold text-md text-white disabled:cursor-not-allowed disabled:opacity-60"
         >
+          <ArrowRight className="h-4 w-4 text-white/70" />
           {loading ? "Signing Up..." : "Sign Up"}
         </button>
         <div className="flex items-center gap-3">

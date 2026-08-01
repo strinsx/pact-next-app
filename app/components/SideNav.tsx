@@ -17,7 +17,8 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
 } from "lucide-react";
-import { createClient } from "@/app/lib/supabase/client";
+import { getCurrentUser, signOut } from "@/app/lib/services/auth";
+import { getProfileByUserId } from "@/app/lib/services/profile";
 
 const mainNav = [
   { href: "/home", label: "Dashboard", icon: LayoutDashboard },
@@ -33,15 +34,13 @@ export default function SideNav() {
 
   useEffect(() => {
     const loadProfile = async () => {
-      const supabase = createClient();
-      const { data, error } = await supabase.auth.getUser();
-      if (error || !data.user) return;
+      const user = await getCurrentUser();
+      if (!user) return;
 
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("full_name, username")
-        .eq("user_id", data.user.id)
-        .maybeSingle();
+      const { data: profile } = await getProfileByUserId(
+        user.id,
+        "full_name, username"
+      );
 
       if (profile) {
         setFullName(profile.full_name);
@@ -53,8 +52,7 @@ export default function SideNav() {
   }, []);
 
   const handleLogout = async () => {
-    const supabase = createClient();
-    await supabase.auth.signOut();
+    await signOut();
     window.location.href = "/auth/login";
   };
 
