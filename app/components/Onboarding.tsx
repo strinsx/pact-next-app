@@ -1,9 +1,10 @@
 "use client";
 
-import { ArrowRight } from "lucide-react";
+import { User, UserPlus, UserRoundPlus } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { createClient } from "@/app/lib/supabase/client";
+import { getCurrentUser } from "@/app/lib/services/auth";
+import { getProfileByUserId, updateUsername } from "@/app/lib/services/profile";
 
 export default function Onboarding() {
   const router = useRouter();
@@ -15,24 +16,19 @@ export default function Onboarding() {
 
   useEffect(() => {
     const loadUser = async () => {
-      const supabase = createClient();
-      const { data, error } = await supabase.auth.getUser();
+      const user = await getCurrentUser();
 
-      if (error || !data.user) {
+      if (!user) {
         router.push("/auth/login");
         return;
       }
 
-      const fullName = data.user.user_metadata?.full_name as string | undefined;
+      const fullName = user.user_metadata?.full_name as string | undefined;
       if (fullName) {
         setFirstName(fullName.trim().split(/\s+/)[0] || "User");
       }
 
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("username")
-        .eq("user_id", data.user.id)
-        .maybeSingle();
+      const { data: profile } = await getProfileByUserId(user.id, "username");
 
       if (profile?.username) {
         router.push("/");
@@ -45,35 +41,35 @@ export default function Onboarding() {
     loadUser();
   }, [router]);
 
-  const handleContinue = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    setError(null);
-
+  const saveUsername = async () => {
     const trimmed = username.trim();
-    if (!trimmed) {
-      setError("Please enter a username.");
-      return;
-    }
+    if (!trimmed) return;
 
-    setSaving(true);
-    const supabase = createClient();
-    const { data: { user } } = await supabase.auth.getUser();
+    const user = await getCurrentUser();
 
     if (user) {
-      const { error: updateError } = await supabase
-        .from("profiles")
-        .update({ username: trimmed })
-        .eq("user_id", user.id);
+      const { error: updateError } = await updateUsername(user.id, trimmed);
 
       if (updateError) {
         setError(updateError.message);
-        setSaving(false);
         return;
       }
     }
+  };
 
+  const handleChoose = async (mode: "create" | "join" | "solo") => {
+    setError(null);
+    setSaving(true);
+    await saveUsername();
     setSaving(false);
-    router.push("/");
+
+    if (mode === "create") {
+      router.push("/groups/create");
+    } else if (mode === "join") {
+      router.push("/groups/join");
+    } else {
+      window.location.href = "/";
+    }
   };
 
   return (
@@ -84,10 +80,7 @@ export default function Onboarding() {
       <p className="mt-2 font-poppins text-sm font-semibold text-muted">
         Choose a username to start your Pact
       </p>
-      <form
-        onSubmit={handleContinue}
-        className="mt-8 flex w-full max-w-sm flex-col gap-5 rounded-2xl border-1 border-border bg-surface p-8"
-      >
+      <div className="mt-8 flex w-full max-w-sm flex-col gap-5 rounded-2xl border-1 border-border bg-surface p-8">
         {error && (
           <p className="rounded-lg border-1 border-red-500/30 bg-red-500/10 px-3 py-2 font-nunito text-sm text-red-500">
             {error}
@@ -104,15 +97,44 @@ export default function Onboarding() {
           required
           className="w-full rounded-xl border-1 border-border bg-transparent py-1 px-4 font-nunito text-sm text-primary shadow-sm placeholder:text-muted focus:outline-none"
         />
+        <p className="mt-[-12px] font-nunito text-xs text-muted/50">
+          This will be your public handle in groups
+        </p>
+        <div className="flex items-center gap-3">
+          <div className="h-px flex-1 bg-border" />
+          <span className="font-nunito text-xs font-semibold uppercase tracking-wide text-muted/50">
+            How do you want to start?
+          </span>
+          <div className="h-px flex-1 bg-border" />
+        </div>
         <button
-          type="submit"
+          type="button"
+          onClick={() => handleChoose("create")}
           disabled={loading || saving}
-          className="mt-2 w-full cursor-pointer rounded-xl bg-secondary py-1 font-nunito font-bold text-md text-white disabled:cursor-not-allowed disabled:opacity-60"
+          className="w-full cursor-pointer rounded-xl border-1 border-border bg-surface py-1 font-nunito font-bold text-md text-primary shadow-sm disabled:cursor-not-allowed disabled:opacity-60"
         >
-          <ArrowRight className="mr-2 h-4 w-4 text-white/70" />
-          {saving ? "Continuing..." : "Continue"}
+          <UserRoundPlus className="mr-2 inline h-4 w-4 text-secondary" />
+          Create Group
         </button>
-      </form>
+        <button
+          type="button"
+          onClick={() => handleChoose("join")}
+          disabled={loading || saving}
+          className="w-full cursor-pointer rounded-xl border-1 border-border bg-surface py-1 font-nunito font-bold text-md text-primary shadow-sm disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          <UserPlus className="mr-2 inline h-4 w-4 text-secondary" />
+          Join Group
+        </button>
+        <button
+          type="button"
+          onClick={() => handleChoose("solo")}
+          disabled={loading || saving}
+          className="w-full cursor-pointer rounded-xl border-1 border-border bg-surface py-1 font-nunito font-bold text-md text-primary shadow-sm disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          <User className="mr-2 inline h-4 w-4 text-secondary" />
+          Solo
+        </button>
+      </div>
     </div>
   );
 }
