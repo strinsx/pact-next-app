@@ -3,8 +3,11 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { createClient } from "@/app/lib/supabase/client";
-import { getPostAuthDestination } from "@/app/lib/auth/redirect";
+import {
+  getCurrentUser,
+  getPostAuthDestination,
+} from "@/app/lib/services/auth";
+import { getProfileByUserId, createProfile } from "@/app/lib/services/profile";
 
 export default function AuthCallback() {
   const router = useRouter();
@@ -14,33 +17,24 @@ export default function AuthCallback() {
     let cancelled = false;
 
     const handleCallback = async () => {
-      const supabase = createClient();
-      const { data, error } = await supabase.auth.getUser();
+      const user = await getCurrentUser();
 
       if (cancelled) return;
 
-      if (error || !data.user) {
+      if (!user) {
         setError("Sign-in could not be completed. Please try again.");
         return;
       }
 
       const fullName =
-        data.user.user_metadata?.full_name ?? data.user.user_metadata?.name ?? null;
+        user.user_metadata?.full_name ?? user.user_metadata?.name ?? null;
 
-      const { data: existing } = await supabase
-        .from("profiles")
-        .select("id")
-        .eq("user_id", data.user.id)
-        .maybeSingle();
+      const { data: existing } = await getProfileByUserId(user.id, "id");
 
       if (cancelled) return;
 
       if (!existing) {
-        const { error: insertError } = await supabase.from("profiles").insert({
-          id: crypto.randomUUID(),
-          user_id: data.user.id,
-          full_name: fullName,
-        });
+        const { error: insertError } = await createProfile(user.id, fullName);
 
         if (cancelled) return;
 
@@ -50,7 +44,7 @@ export default function AuthCallback() {
         }
       }
 
-      const destination = await getPostAuthDestination(data.user.id);
+      const destination = await getPostAuthDestination(user.id);
       if (cancelled) return;
 
       router.push(destination);
