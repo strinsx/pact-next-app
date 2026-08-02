@@ -1,53 +1,47 @@
 "use client";
 
 import { Flame } from "lucide-react";
-import { useSyncExternalStore } from "react";
+import { useEffect, useState } from "react";
 import AreaChart from "@/app/components/AreaChart";
-
-const values = [72, 84, 65, 91];
-
-const emptySubscribe = () => () => {};
-
-let cachedLabels: string[] | null = null;
-
-function getWeekLabels(): string[] {
-  if (cachedLabels) return cachedLabels;
-
-  const now = new Date();
-  const diffToMonday = (now.getDay() + 6) % 7;
-  const thisMonday = new Date(
-    now.getFullYear(),
-    now.getMonth(),
-    now.getDate() - diffToMonday
-  );
-
-  const fmt = (d: Date) =>
-    d.toLocaleString("en", { month: "short", day: "numeric" });
-
-  cachedLabels = [3, 2, 1, 0].map((offset) => {
-    const monday = new Date(
-      thisMonday.getFullYear(),
-      thisMonday.getMonth(),
-      thisMonday.getDate() - offset * 7
-    );
-    const sunday = new Date(
-      monday.getFullYear(),
-      monday.getMonth(),
-      monday.getDate() + 6
-    );
-    return `${fmt(monday)} – ${fmt(sunday)}`;
-  });
-
-  return cachedLabels;
-}
+import { getCurrentUser } from "@/app/lib/services/auth";
+import { getProfileByUserId } from "@/app/lib/services/profile";
+import {
+  getWeeklyConsistency,
+  WeeklyConsistencyDatum,
+} from "@/app/lib/services/commitments";
 
 export default function WeeklyConsistencyCard() {
-  const labels = useSyncExternalStore(emptySubscribe, getWeekLabels, () => []);
+  const [data, setData] = useState<WeeklyConsistencyDatum[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const weeklyData = labels.map((label, i) => ({
-    label,
-    value: values[i] ?? 0,
-  }));
+  useEffect(() => {
+    const loadWeekly = async () => {
+      const user = await getCurrentUser();
+      if (!user) {
+        setLoading(false);
+        return;
+      }
+
+      const { data: profile } = await getProfileByUserId(user.id, "id");
+
+      if (!profile) {
+        setLoading(false);
+        return;
+      }
+
+      setData(await getWeeklyConsistency(profile.id));
+      setLoading(false);
+    };
+
+    loadWeekly();
+  }, []);
+
+  const avg =
+    data.length > 0
+      ? Math.round(
+          data.reduce((sum, d) => sum + d.value, 0) / data.length
+        )
+      : 0;
 
   return (
     <div className="w-full flex-1 rounded-2xl border-1 border-border bg-surface p-6">
@@ -57,18 +51,18 @@ export default function WeeklyConsistencyCard() {
         </h2>
         <span className="flex items-center gap-2 rounded-full bg-purple/10 px-3 py-1 font-nunito text-xs font-bold text-purple">
           <Flame className="h-3.5 w-3.5" />
-          78% avg
+          {loading ? "..." : `${avg}% avg`}
         </span>
       </div>
       <div className="mt-6">
         <AreaChart
-          data={weeklyData}
+          data={data}
           from="#56d9c8"
           to="#4a90f5"
           id="weeklyGrad"
         />
         <div className="mt-2 flex justify-between">
-          {weeklyData.map((week) => (
+          {data.map((week) => (
             <span key={week.label} className="font-nunito text-xs text-muted">
               {week.label}
             </span>
