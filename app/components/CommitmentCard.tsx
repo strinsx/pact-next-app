@@ -255,6 +255,7 @@ export default function CommitmentCard() {
         open={createOpen}
         type={selectedType}
         evaluationTime={evaluationTime}
+        existingTitles={items.map((c) => c.title)}
         onClose={() => setCreateOpen(false)}
         onCreated={() => {
           setCreateOpen(false);

@@ -24,6 +24,21 @@ export interface NewCommitment {
   evaluationTime: string;
 }
 
+export const normalizeCommitmentText = (title: string) =>
+  title.trim().toLowerCase().replace(/\s+/g, " ");
+
+export const hasDuplicateTitle = (
+  commitments: { id: string; title: string }[],
+  title: string,
+  excludeId?: string
+) => {
+  const normalized = normalizeCommitmentText(title);
+  return commitments.some(
+    (c) =>
+      c.id !== excludeId && normalizeCommitmentText(c.title) === normalized
+  );
+};
+
 export const toHHMM = (time?: string | null) => {
   if (!time) return "23:59";
   const parts = time.split(":");
