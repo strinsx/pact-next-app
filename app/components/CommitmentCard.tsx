@@ -215,10 +215,12 @@ export default function CommitmentCard() {
                 key={commitment.id}
                 onClick={() =>
                   commitment.status !== "submitted" &&
+                  commitment.status !== "missed" &&
                   setSelected(commitment)
                 }
                 className={`flex items-center justify-between rounded-xl border-1 border-border bg-background px-4 py-3 transition-colors ${
-                  commitment.status === "submitted"
+                  commitment.status === "submitted" ||
+                  commitment.status === "missed"
                     ? "cursor-default"
                     : "cursor-pointer hover:border-secondary"
                 }`}

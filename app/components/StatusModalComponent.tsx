@@ -1,9 +1,11 @@
 "use client";
 
-import { Check, Pencil, Trash2, X } from "lucide-react";
+import { GitCommitHorizontal, Pencil, Trash2, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import TimePicker from "@/app/components/TimePicker";
 import StatusDropdown from "@/app/components/StatusDropdown";
+import CommitConfirmationModal from "@/app/components/CommitConfirmationModal";
+import ConfirmationModalForMissed from "@/app/components/ConfirmationModalForMissed";
 
 export interface StatusCommitment {
   id: string;
@@ -52,6 +54,8 @@ export default function StatusModalComponent({
       : "pending"
   );
   const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const [confirmingCommit, setConfirmingCommit] = useState(false);
+  const [confirmingMissedCommit, setConfirmingMissedCommit] = useState(false);
 
   useEffect(() => {
     if (!commitment) return;
@@ -71,10 +75,19 @@ export default function StatusModalComponent({
   };
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4"
-      onClick={onClose}
-    >
+    <>
+      <div
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4"
+        onClick={onClose}
+      >
+      <svg width="0" height="0" className="absolute">
+        <defs>
+          <linearGradient id="commitIconGrad" x1="0" y1="0" x2="1" y2="0">
+            <stop offset="0%" stopColor="#a37af7" />
+            <stop offset="100%" stopColor="#4a90f5" />
+          </linearGradient>
+        </defs>
+      </svg>
       <div
         className="w-full max-w-md rounded-[20px] border-1 border-border bg-surface p-8 shadow-xl"
         onClick={(e) => e.stopPropagation()}
@@ -207,11 +220,20 @@ export default function StatusModalComponent({
             <div className="flex flex-col gap-3">
               <button
                 type="button"
-                onClick={() => onSubmit(commitment.id, status)}
-                className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border-1 border-border bg-white py-2 font-nunito font-bold text-primary shadow-sm transition-colors hover:bg-border/50"
+                onClick={() =>
+                  status === "missed"
+                    ? setConfirmingMissedCommit(true)
+                    : setConfirmingCommit(true)
+                }
+                className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border-1 border-teal/30 bg-teal/10 py-2 font-nunito font-bold text-teal transition-colors hover:bg-teal/20"
               >
-                <Check className="h-4 w-4 text-teal" />
-                Commit
+                <GitCommitHorizontal
+                  className="h-4 w-4"
+                  stroke="url(#commitIconGrad)"
+                />
+                <span className="bg-gradient-to-r from-purple to-secondary bg-clip-text text-transparent">
+                  Commit
+                </span>
               </button>
               <div className="flex gap-3">
                 <button
@@ -234,7 +256,26 @@ export default function StatusModalComponent({
             </div>
           </div>
         )}
+        </div>
       </div>
-    </div>
+      <CommitConfirmationModal
+        open={confirmingCommit}
+        title={commitment.title}
+        onClose={() => setConfirmingCommit(false)}
+        onConfirm={() => {
+          setConfirmingCommit(false);
+          onSubmit(commitment.id, "submitted");
+        }}
+      />
+      <ConfirmationModalForMissed
+        open={confirmingMissedCommit}
+        title={commitment.title}
+        onClose={() => setConfirmingMissedCommit(false)}
+        onConfirm={() => {
+          setConfirmingMissedCommit(false);
+          onSubmit(commitment.id, "submitted");
+        }}
+      />
+    </>
   );
 }
