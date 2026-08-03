@@ -225,10 +225,14 @@ export async function getProfileStats(
   const supabase = createClient();
   const { data: rows } = await supabase
     .from("commitments")
-    .select("status, commitment_date")
+    .select("status, commitment_date, evaluation_time")
     .eq("profile_id", profileId);
 
-  const all = (rows ?? []) as { status: string; commitment_date: string }[];
+  const all = (rows ?? []) as {
+    status: string;
+    commitment_date: string;
+    evaluation_time: string | null;
+  }[];
 
   let submittedCount = 0;
   let missedCount = 0;
@@ -239,14 +243,20 @@ export async function getProfileStats(
   >();
 
   for (const row of all) {
-    if (row.status === "submitted") submittedCount += 1;
-    else if (row.status === "missed") missedCount += 1;
+    const effectiveStatus =
+      row.status === "pending" &&
+      isPastEvaluation(row.commitment_date, toHHMM(row.evaluation_time))
+        ? "missed"
+        : row.status;
+
+    if (effectiveStatus === "submitted") submittedCount += 1;
+    else if (effectiveStatus === "missed") missedCount += 1;
 
     const day = row.commitment_date.slice(0, 10);
     const entry = byDay.get(day) ?? { total: 0, done: 0, hasPending: false };
     entry.total += 1;
-    if (row.status === "submitted") entry.done += 1;
-    if (row.status === "pending") entry.hasPending = true;
+    if (effectiveStatus === "submitted") entry.done += 1;
+    if (effectiveStatus === "pending") entry.hasPending = true;
     byDay.set(day, entry);
   }
 
