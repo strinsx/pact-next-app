@@ -24,6 +24,21 @@ export interface NewCommitment {
   evaluationTime: string;
 }
 
+export const normalizeCommitmentText = (title: string) =>
+  title.trim().toLowerCase().replace(/\s+/g, " ");
+
+export const hasDuplicateTitle = (
+  commitments: { id: string; title: string }[],
+  title: string,
+  excludeId?: string
+) => {
+  const normalized = normalizeCommitmentText(title);
+  return commitments.some(
+    (c) =>
+      c.id !== excludeId && normalizeCommitmentText(c.title) === normalized
+  );
+};
+
 export const toHHMM = (time?: string | null) => {
   if (!time) return "23:59";
   const parts = time.split(":");
@@ -135,4 +150,146 @@ export async function getSubmittedCommitmentsBetween(
     .eq("status", "submitted")
     .gte("submitted_at", from)
     .lt("submitted_at", to);
+}
+
+export interface WeeklyConsistencyDatum {
+  label: string;
+  value: number;
+}
+
+export async function getWeeklyConsistency(
+  profileId: string
+): Promise<WeeklyConsistencyDatum[]> {
+  const supabase = createClient();
+  const { data: rows } = await supabase
+    .from("commitments")
+    .select("status, commitment_date")
+    .eq("profile_id", profileId)
+    .order("commitment_date", { ascending: true });
+
+  const all = (rows ?? []) as { status: string; commitment_date: string }[];
+
+  if (all.length === 0) return [];
+
+  const anchor = new Date(`${all[0].commitment_date}T00:00:00`);
+  anchor.setHours(0, 0, 0, 0);
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const daysDiff = Math.floor((today.getTime() - anchor.getTime()) / 86400000);
+  const weekIndex = Math.max(0, Math.floor(daysDiff / 7));
+
+  const weekStart = new Date(anchor);
+  weekStart.setDate(weekStart.getDate() + weekIndex * 7);
+
+  const byDay = new Map<string, { done: number; missed: number }>();
+  for (const row of all) {
+    const day = row.commitment_date.slice(0, 10);
+    const entry = byDay.get(day) ?? { done: 0, missed: 0 };
+    if (row.status === "submitted") entry.done += 1;
+    else if (row.status === "missed") entry.missed += 1;
+    byDay.set(day, entry);
+  }
+
+  const fmt = (d: Date) =>
+    d.toLocaleString("en", { month: "short", day: "numeric" });
+
+  const result: WeeklyConsistencyDatum[] = [];
+
+  for (let i = 0; i < 7; i++) {
+    const day = new Date(weekStart);
+    day.setDate(day.getDate() + i);
+
+    const entry = byDay.get(formatLocalDate(day));
+    const evaluated = entry ? entry.done + entry.missed : 0;
+    const value =
+      evaluated > 0 ? Math.round((entry!.done / evaluated) * 100) : 0;
+
+    result.push({ label: fmt(day), value });
+  }
+
+  return result;
+}
+
+
+export interface ProfileStats {
+  completionRate: number;
+  submittedCount: number;
+  dayStreak: number;
+}
+
+export async function getProfileStats(
+  profileId: string
+): Promise<ProfileStats> {
+  const supabase = createClient();
+  const { data: rows } = await supabase
+    .from("commitments")
+    .select("status, commitment_date, evaluation_time")
+    .eq("profile_id", profileId);
+
+  const all = (rows ?? []) as {
+    status: string;
+    commitment_date: string;
+    evaluation_time: string | null;
+  }[];
+
+  let submittedCount = 0;
+  let missedCount = 0;
+
+  const byDay = new Map<
+    string,
+    { total: number; done: number; hasPending: boolean }
+  >();
+
+  for (const row of all) {
+    const effectiveStatus =
+      row.status === "pending" &&
+      isPastEvaluation(row.commitment_date, toHHMM(row.evaluation_time))
+        ? "missed"
+        : row.status;
+
+    if (effectiveStatus === "submitted") submittedCount += 1;
+    else if (effectiveStatus === "missed") missedCount += 1;
+
+    const day = row.commitment_date.slice(0, 10);
+    const entry = byDay.get(day) ?? { total: 0, done: 0, hasPending: false };
+    entry.total += 1;
+    if (effectiveStatus === "submitted") entry.done += 1;
+    if (effectiveStatus === "pending") entry.hasPending = true;
+    byDay.set(day, entry);
+  }
+
+  const evaluated = submittedCount + missedCount;
+  const completionRate =
+    evaluated > 0 ? Math.round((submittedCount / evaluated) * 100) : 0;
+
+  let dayStreak = 0;
+  const cursor = new Date();
+  cursor.setHours(0, 0, 0, 0);
+
+  for (let i = 0; i < 10000; i++) {
+    const day = formatLocalDate(cursor);
+    const entry = byDay.get(day);
+
+    if (!entry) {
+      cursor.setDate(cursor.getDate() - 1);
+      continue;
+    }
+
+    if (entry.done === entry.total) {
+      dayStreak += 1;
+      cursor.setDate(cursor.getDate() - 1);
+      continue;
+    }
+
+    if (entry.hasPending) {
+      cursor.setDate(cursor.getDate() - 1);
+      continue;
+    }
+
+    break;
+  }
+
+  return { completionRate, submittedCount, dayStreak };
 }

@@ -215,10 +215,12 @@ export default function CommitmentCard() {
                 key={commitment.id}
                 onClick={() =>
                   commitment.status !== "submitted" &&
+                  commitment.status !== "missed" &&
                   setSelected(commitment)
                 }
                 className={`flex items-center justify-between rounded-xl border-1 border-border bg-background px-4 py-3 transition-colors ${
-                  commitment.status === "submitted"
+                  commitment.status === "submitted" ||
+                  commitment.status === "missed"
                     ? "cursor-default"
                     : "cursor-pointer hover:border-secondary"
                 }`}
@@ -255,6 +257,7 @@ export default function CommitmentCard() {
         open={createOpen}
         type={selectedType}
         evaluationTime={evaluationTime}
+        existingTitles={items.map((c) => c.title)}
         onClose={() => setCreateOpen(false)}
         onCreated={() => {
           setCreateOpen(false);

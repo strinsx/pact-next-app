@@ -7,7 +7,6 @@ import CommitmentCard from "@/app/components/CommitmentCard";
 import MonthlyAnalysisCard from "@/app/components/MonthlyAnalysisCard";
 import WeeklyAnalysisCard from "@/app/components/WeeklyAnalysisCard";
 import GroupFeedCard from "@/app/components/GroupFeedCard";
-import GroupRankingCard from "@/app/components/GroupRankingCard";
 import { getCurrentUser } from "@/app/lib/services/auth";
 import { getProfileByUserId } from "@/app/lib/services/profile";
 
@@ -69,9 +68,6 @@ export default function Home() {
           </div>
           <div className="mt-2 w-full">
             <GroupFeedCard />
-          </div>
-          <div className="mt-2 flex w-full justify-center gap-4">
-            <GroupRankingCard />
           </div>
         </div>
       </main>

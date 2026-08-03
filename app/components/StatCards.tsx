@@ -1,19 +1,62 @@
-import { Target, ClipboardCheck, Flame } from "lucide-react";
+"use client";
 
-const stats = [
-  { label: "Completion Rate", value: "86%", icon: Target },
-  { label: "Commitments Submitted", value: "12", icon: ClipboardCheck },
-  { label: "Day Streak", value: "7", icon: Flame },
-];
+import { Target, ClipboardCheck, Flame } from "lucide-react";
+import { useEffect, useState } from "react";
+import { getCurrentUser } from "@/app/lib/services/auth";
+import { getProfileByUserId } from "@/app/lib/services/profile";
+import { getProfileStats, ProfileStats } from "@/app/lib/services/commitments";
 
 export default function StatCards() {
+  const [stats, setStats] = useState<ProfileStats | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadStats = async () => {
+      const user = await getCurrentUser();
+      if (!user) {
+        setLoading(false);
+        return;
+      }
+
+      const { data: profile } = await getProfileByUserId(user.id, "id");
+
+      if (!profile) {
+        setLoading(false);
+        return;
+      }
+
+      setStats(await getProfileStats(profile.id));
+      setLoading(false);
+    };
+
+    loadStats();
+  }, []);
+
+  const statItems = [
+    {
+      label: "Completion Rate",
+      value: loading ? "..." : stats ? `${stats.completionRate}%` : "0%",
+      icon: Target,
+    },
+    {
+      label: "Commitments Submitted",
+      value: loading ? "..." : stats ? String(stats.submittedCount) : "0",
+      icon: ClipboardCheck,
+    },
+    {
+      label: "Day Streak",
+      value: loading ? "..." : stats ? String(stats.dayStreak) : "0",
+      icon: Flame,
+    },
+  ];
+
   return (
     <div className="flex w-full flex-col items-center gap-4">
       <h2 className="self-start font-poppins text-xl font-bold text-primary">
-       Your Personal Stats
+        Your Personal Stats
       </h2>
       <div className="flex flex-wrap justify-center gap-6">
-        {stats.map((stat) => (
+        {statItems.map((stat) => (
           <div
             key={stat.label}
             className="flex w-100 flex-col gap-2 rounded-2xl border-1 border-border bg-surface p-6 text-left"
