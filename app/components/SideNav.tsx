@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 import {
   LayoutDashboard,
   ChartColumn,
@@ -14,11 +14,15 @@ import {
   ChevronRight,
   Users,
   Bell,
+  UserRoundPlus,
+  UserPlus,
   PanelLeftClose,
   PanelLeftOpen,
 } from "lucide-react";
 import { getCurrentUser, signOut } from "@/app/lib/services/auth";
 import { getProfileByUserId } from "@/app/lib/services/profile";
+import CreateGroupModal from "@/app/components/CreateGroupModal";
+import JoinGroupModal from "@/app/components/JoinGroupModal";
 
 const mainNav = [
   { href: "/home", label: "Dashboard", icon: LayoutDashboard },
@@ -26,11 +30,71 @@ const mainNav = [
   { href: "/profile", label: "Profile", icon: CircleUser },
 ];
 
+const groupSections = [
+  { id: "overview", label: "Overview" },
+  { id: "join-access", label: "Join Access" },
+  { id: "members", label: "Members" },
+];
+
+let cachedActiveSection = "overview";
+const storeListeners = new Set<() => void>();
+let rafId: number | null = null;
+
+function emitStoreChange() {
+  storeListeners.forEach((listener) => listener());
+}
+
+function subscribeToScroll(onStoreChange: () => void) {
+  storeListeners.add(onStoreChange);
+
+  const handleScroll = () => {
+    if (rafId !== null) return;
+    rafId = requestAnimationFrame(() => {
+      rafId = null;
+      emitStoreChange();
+    });
+  };
+
+  window.addEventListener("scroll", handleScroll, { passive: true });
+  window.addEventListener("resize", handleScroll, { passive: true });
+  return () => {
+    storeListeners.delete(onStoreChange);
+    window.removeEventListener("scroll", handleScroll);
+    window.removeEventListener("resize", handleScroll);
+  };
+}
+
+function getActiveSection() {
+  if (typeof window === "undefined") return cachedActiveSection;
+
+  let active = "overview";
+  for (const section of groupSections) {
+    const el = document.getElementById(section.id);
+    if (el && el.getBoundingClientRect().top <= 120) active = section.id;
+  }
+  if (cachedActiveSection !== active) cachedActiveSection = active;
+  return cachedActiveSection;
+}
+
+const scrollToSection = (id: string) => {
+  cachedActiveSection = id;
+  emitStoreChange();
+  document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+};
+
 export default function SideNav() {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
   const [fullName, setFullName] = useState<string | null>(null);
   const [username, setUsername] = useState<string | null>(null);
+  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [createGroupOpen, setCreateGroupOpen] = useState(false);
+  const [joinGroupOpen, setJoinGroupOpen] = useState(false);
+  const activeSection = useSyncExternalStore(
+    subscribeToScroll,
+    getActiveSection,
+    getActiveSection
+  );
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -56,6 +120,16 @@ export default function SideNav() {
     window.location.href = "/auth/login";
   };
 
+  useEffect(() => {
+    if (!confirmOpen) return;
+
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setConfirmOpen(false);
+    };
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [confirmOpen]);
+
   return (
     <aside
       className={`sticky top-0 flex h-screen flex-col overflow-hidden border-r border-border bg-surface transition-all duration-300 ${
@@ -64,7 +138,7 @@ export default function SideNav() {
     >
       <div className="flex-1 overflow-y-auto">
         <div
-          className={`flex items-center gap-3 py-8 ${
+          className={`flex items-center gap-3 pt-6 pb-6 ${
             collapsed ? "justify-center px-0" : "px-6"
           }`}
         >
@@ -146,6 +220,30 @@ export default function SideNav() {
           );
         })}
       </nav>
+      <nav className={`flex flex-col gap-1 ${collapsed ? "mt-4 px-3" : "mt-4 px-3"}`}>
+        <button
+          type="button"
+          onClick={() => setCreateGroupOpen(true)}
+          title="Create Group"
+          className={`flex items-center gap-3 rounded-xl py-2 font-nunito text-sm font-semibold transition-colors ${
+            collapsed ? "justify-center px-0" : "px-4"
+          } text-muted hover:bg-border/50 hover:text-primary`}
+        >
+          <UserRoundPlus className="h-4 w-4 shrink-0" />
+          {!collapsed && "Create Group"}
+        </button>
+        <button
+          type="button"
+          onClick={() => setJoinGroupOpen(true)}
+          title="Join Group"
+          className={`flex items-center gap-3 rounded-xl py-2 font-nunito text-sm font-semibold transition-colors ${
+            collapsed ? "justify-center px-0" : "px-4"
+          } text-muted hover:bg-border/50 hover:text-primary`}
+        >
+          <UserPlus className="h-4 w-4 shrink-0" />
+          {!collapsed && "Join Group"}
+        </button>
+      </nav>
       {!collapsed && (
         <div className="mt-6 px-6">
           <span className="font-nunito text-xs font-bold uppercase tracking-wide text-muted">
@@ -171,11 +269,32 @@ export default function SideNav() {
           </span>
           {!collapsed && <ChevronRight className="h-4 w-4 shrink-0" />}
         </Link>
+        {pathname.startsWith("/groups") && !collapsed && (
+          <div className="ml-3 flex flex-col gap-1 border-l-2 border-border pl-3">
+            {groupSections.map((sub) => {
+              const isSubActive = activeSection === sub.id;
+              return (
+                <button
+                  key={sub.id}
+                  type="button"
+                  onClick={() => scrollToSection(sub.id)}
+                  className={`cursor-pointer rounded-lg py-1.5 pl-2 text-left font-nunito text-sm font-semibold transition-colors ${
+                    isSubActive
+                      ? "text-secondary"
+                      : "text-muted hover:text-primary"
+                  }`}
+                >
+                  {sub.label}
+                </button>
+              );
+            })}
+          </div>
+        )}
       </nav>
       </div>
       <button
         type="button"
-        onClick={handleLogout}
+        onClick={() => setConfirmOpen(true)}
         title="Logout"
         className={`mt-auto flex items-center gap-3 py-5 font-nunito text-sm font-semibold text-muted transition-colors hover:text-red-500 ${
           collapsed ? "justify-center px-0" : "px-7"
@@ -199,6 +318,51 @@ export default function SideNav() {
           </>
         )}
       </button>
+      {confirmOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4"
+          onClick={() => setConfirmOpen(false)}
+        >
+          <div
+            className="w-full max-w-sm rounded-[20px] border-1 border-border bg-surface p-8 text-center shadow-xl"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-red-500/10">
+              <LogOut className="h-6 w-6 text-red-500" />
+            </div>
+            <h2 className="mt-4 font-poppins text-xl font-bold text-primary">
+              Sign out of Pact?
+            </h2>
+            <p className="mt-1 font-nunito text-sm text-muted">
+              You will need to sign back in to view your commitments.
+            </p>
+            <div className="mt-6 flex gap-3">
+              <button
+                type="button"
+                onClick={() => setConfirmOpen(false)}
+                className="flex-1 cursor-pointer rounded-lg border-1 border-border bg-surface py-2 font-nunito font-bold text-muted transition-colors hover:bg-border/50 hover:text-primary"
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="flex-1 cursor-pointer rounded-lg bg-red-500 py-2 font-nunito font-bold text-white transition-colors hover:bg-red-600"
+              >
+                Sign out
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      <CreateGroupModal
+        open={createGroupOpen}
+        onClose={() => setCreateGroupOpen(false)}
+      />
+      <JoinGroupModal
+        open={joinGroupOpen}
+        onClose={() => setJoinGroupOpen(false)}
+      />
     </aside>
   );
 }
