@@ -74,8 +74,9 @@ app/
 │   ├── StatusDropdown.tsx        # pending/submitted/missed selector
 │   ├── CommitConfirmationModal.tsx / ConfirmationModalForMissed.tsx
 │   ├── ArchiveModal.tsx          # commitments past evaluation deadline
-│   ├── MonthlyAnalysisCard.tsx   # "Daily Commitments" area chart
+│   ├── MonthlyAnalysisCard.tsx   # "Daily Commitments" stacked bar chart (submitted/missed)
 │   ├── WeeklyAnalysisCard.tsx    # "Weekly Consistency" area chart
+│   ├── YearlyHeatmapCard.tsx     # "Yearly Contributions" GitHub-style heatmap
 │   ├── AreaChart.tsx             # reusable SVG monotone area chart
 │   ├── GroupRankingCard.tsx      # mock leaderboard (home)
 │   ├── GroupFeedCard.tsx         # group feed (real-time posts, emoji reactions, comments)
@@ -168,7 +169,7 @@ Service: `app/lib/services/auth.ts`. Supabase client: `app/lib/supabase/client.t
 | --- | --- |
 | `auth.ts` | Session + auth actions (wraps the Supabase auth API). |
 | `profile.ts` | `getProfileByUserId`, `createProfile`, `updateUsername`, `updateEvaluationTime`. |
-| `commitments.ts` | CRUD, `nextEvaluationDate`, `isPastEvaluation`, `getSubmittedCommitmentsBetween`, `getWeeklyConsistency`, `getProfileStats`, duplicate-title check. |
+| `commitments.ts` | CRUD, `nextEvaluationDate`, `isPastEvaluation`, `getSubmittedCommitmentsBetween`, `getWeeklyCommitmentBreakdown`, `getWeeklyConsistency`, `getYearlyConsistency`, `getProfileStats`, duplicate-title check. |
 | `groups.ts` | `getMyGroups`, `createGroup`, `joinGroupByInviteCode`, `getPendingJoinRequests`, `getMyGroupOverview`. |
 | `feed.ts` | `postCommitmentToFeed` (fan-out insert to all user's groups), `getGroupFeed` (joins group + profile names, relative time). |
 
@@ -193,10 +194,14 @@ Layout (`max-w-7xl`, `m-auto` wrapper avoids scroll-clipping):
 2. **CommitmentCard** — "Commitments for today", per-item status pill
    (pending `purple`, submitted `teal`, missed `red`), per-profile `TimePicker`
    (evaluation deadline), Archive button, Create button.
-3. **MonthlyAnalysisCard** (Daily Commitments) + **WeeklyAnalysisCard**
+3. **MonthlyAnalysisCard** (Daily Commitments) — stacked bar chart (teal =
+   submitted, red = missed per day, Mon-Sun) + **WeeklyAnalysisCard**
    (Weekly Consistency) — hand-rolled SVG area charts with browser-generated
    week labels.
-4. **GroupFeedCard** — real-time feed of group posts with emoji reaction chips and an
+4. **YearlyHeatmapCard** (Yearly Contributions) — GitHub-style daily completion
+   heatmap for the last year (weeks × Mon-Sun, shaded `--color-border` →
+   `--color-purple`, hover tooltip with date + completion %).
+5. **GroupFeedCard** — real-time feed of group posts with emoji reaction chips and an
    add-comment input (both currently mock/client-state).
 
 ### Commitment lifecycle UI
