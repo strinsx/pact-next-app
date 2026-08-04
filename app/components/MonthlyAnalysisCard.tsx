@@ -6,6 +6,7 @@ import AreaChart from "@/app/components/AreaChart";
 import { getCurrentUser } from "@/app/lib/services/auth";
 import { getProfileByUserId } from "@/app/lib/services/profile";
 import { getSubmittedCommitmentsBetween } from "@/app/lib/services/commitments";
+import { subscribeDataChanged } from "@/app/lib/events";
 
 interface DayDatum {
   label: string;
@@ -85,6 +86,7 @@ export default function DailyCommitmentsCard() {
     };
 
     loadDailyData();
+    return subscribeDataChanged(loadDailyData);
   }, []);
 
   return (

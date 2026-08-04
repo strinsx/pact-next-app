@@ -273,7 +273,7 @@ export default function StatusModalComponent({
         onClose={() => setConfirmingMissedCommit(false)}
         onConfirm={() => {
           setConfirmingMissedCommit(false);
-          onSubmit(commitment.id, "submitted");
+          onSubmit(commitment.id, "missed");
         }}
       />
     </>
