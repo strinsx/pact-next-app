@@ -2,11 +2,14 @@
 
 import { KeyRound, X } from "lucide-react";
 import { useEffect, useState } from "react";
+import { getCurrentUser } from "@/app/lib/services/auth";
+import { getProfileByUserId } from "@/app/lib/services/profile";
+import { joinGroupByInviteCode, JoinedGroup } from "@/app/lib/services/groups";
 
 interface JoinGroupModalProps {
   open: boolean;
   onClose: () => void;
-  onJoin?: (inviteCode: string) => void;
+  onJoin?: (group: JoinedGroup) => void;
 }
 
 export default function JoinGroupModal({
@@ -16,6 +19,8 @@ export default function JoinGroupModal({
 }: JoinGroupModalProps) {
   const [inviteCode, setInviteCode] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
   useEffect(() => {
     if (!open) return;
@@ -31,11 +36,44 @@ export default function JoinGroupModal({
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setError(null);
+    setSuccess(null);
+
+    const code = inviteCode.trim().toUpperCase();
+    if (!code) return;
+
     setSubmitting(true);
-    onJoin?.(inviteCode.trim().toUpperCase());
-    setInviteCode("");
+
+    const user = await getCurrentUser();
+
+    if (!user) {
+      setError("You must be signed in to join a group.");
+      setSubmitting(false);
+      return;
+    }
+
+    const { data: profile } = await getProfileByUserId(user.id, "id");
+
+    if (!profile) {
+      setError("Profile not found. Please finish onboarding.");
+      setSubmitting(false);
+      return;
+    }
+
+    const { error: joinError } = await joinGroupByInviteCode(
+      code,
+      profile.id
+    );
+
     setSubmitting(false);
-    onClose();
+
+    if (joinError) {
+      setError(joinError.message);
+      return;
+    }
+
+    setInviteCode("");
+    setSuccess("Request sent! The owner will review your request.");
   };
 
   return (
@@ -62,6 +100,16 @@ export default function JoinGroupModal({
         <p className="mt-1 text-left font-nunito text-sm text-muted">
           Enter the invite code shared by a group owner
         </p>
+        {error && (
+          <p className="mt-4 rounded-lg border-1 border-red-500/30 bg-red-500/10 px-3 py-2 font-nunito text-sm text-red-500">
+            {error}
+          </p>
+        )}
+        {success && (
+          <p className="mt-4 rounded-lg border-1 border-teal/30 bg-teal/10 px-3 py-2 font-nunito text-sm text-teal">
+            {success}
+          </p>
+        )}
         <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4">
           <div className="flex flex-col gap-1 text-left">
             <label className="font-poppins text-sm font-light text-secondary">
