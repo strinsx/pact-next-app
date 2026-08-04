@@ -1,52 +1,105 @@
 "use client";
 
 import { Clock3, Users, ShieldCheck, LinkIcon, UserRoundCheck } from "lucide-react";
-import { useState } from "react";
-
-const mockGroup = {
-  name: "Fitness Pact",
-  description:
-    "A small accountability circle for daily movement and healthy habits. Commit, show up, and hold each other accountable.",
-  pendingRequests: 3,
-  memberCount: 5,
-  inviteCode: "4F7K2Q9X",
-  roles: [
-    { role: "Owner", count: 1 },
-    { role: "Admin", count: 2 },
-    { role: "Member", count: 2 },
-  ],
-};
+import { useEffect, useState } from "react";
+import { getCurrentUser } from "@/app/lib/services/auth";
+import { getProfileByUserId } from "@/app/lib/services/profile";
+import { getMyGroupOverview, GroupOverview } from "@/app/lib/services/groups";
 
 export default function GroupsOverviewCard() {
   const [copied, setCopied] = useState(false);
+  const [generating, setGenerating] = useState(false);
+  const [group, setGroup] = useState<GroupOverview | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const load = async () => {
+      const user = await getCurrentUser();
+      if (!user) return;
+
+      const { data: profile } = await getProfileByUserId(user.id, "id");
+      if (!profile) return;
+
+      const overview = await getMyGroupOverview(profile.id);
+
+      if (!cancelled) {
+        setGroup(overview);
+        setLoading(false);
+      }
+    };
+
+    load();
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const handleGenerate = async () => {
+    if (!group) return;
+    setGenerating(true);
+    setCopied(false);
     await navigator.clipboard.writeText(
-      `${window.location.origin}/groups/join?code=${mockGroup.inviteCode}`
+      `${window.location.origin}/groups/join?code=${group.invite_code}`
     );
+    setGenerating(false);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   };
+
+  if (loading) {
+    return (
+      <div className="w-full rounded-2xl border-1 border-border bg-surface p-6 text-left font-nunito text-sm text-muted">
+        Loading group...
+      </div>
+    );
+  }
+
+  if (!group) {
+    return (
+      <div className="w-full rounded-2xl border-1 border-border bg-surface p-6 text-left">
+        <h2 className="font-poppins text-xl font-bold text-primary">
+          Your Group
+        </h2>
+        <p className="mt-2 font-nunito text-sm text-muted">
+          You haven&apos;t created a group yet. Use the + Commitment button in the
+          sidebar to start one.
+        </p>
+      </div>
+    );
+  }
+
+  const roles = group.roles.map((r) => ({
+    ...r,
+    label: r.role.charAt(0).toUpperCase() + r.role.slice(1),
+  }));
 
   return (
     <div className="w-full rounded-2xl border-1 border-border bg-surface p-6">
       <div className="flex items-start justify-between gap-4">
         <div className="flex flex-col gap-1 text-left">
           <h2 className="bg-gradient-to-r from-sky-400 to-purple bg-clip-text font-poppins text-2xl font-bold text-transparent">
-            {mockGroup.name}
+            {group.name}
           </h2>
           <p className="font-nunito text-sm text-muted">
-            {mockGroup.description}
+            {group.description}
           </p>
         </div>
         <div className="flex shrink-0 flex-col items-end gap-2">
           <button
             type="button"
             onClick={handleGenerate}
-            className="flex cursor-pointer items-center gap-2 rounded-lg border-1 border-border bg-white px-4 py-2 font-nunito text-sm font-bold text-primary shadow-sm transition-colors hover:bg-border/50"
+            disabled={generating}
+            className="flex cursor-pointer items-center gap-2 rounded-lg border-1 border-border bg-white px-4 py-2 font-nunito text-sm font-bold text-primary shadow-sm transition-colors hover:bg-border/50 disabled:cursor-not-allowed disabled:opacity-60"
           >
             <LinkIcon className="h-4 w-4" />
-            {copied ? "Copied" : "Generate join link"}
+            {generating
+              ? "Generating code..."
+              : copied
+                ? "Copied"
+                : "Generate join link"}
           </button>
           <a
             href="#join-access"
@@ -72,7 +125,7 @@ export default function GroupsOverviewCard() {
             </span>
           </div>
           <p className="mt-2 bg-gradient-to-r from-purple to-secondary bg-clip-text font-poppins text-3xl font-bold text-transparent">
-            {mockGroup.pendingRequests}
+            0
           </p>
           <p className="font-nunito text-xs text-muted">join requests</p>
         </div>
@@ -84,7 +137,7 @@ export default function GroupsOverviewCard() {
             </span>
           </div>
           <p className="mt-2 bg-gradient-to-r from-sky-400 to-teal bg-clip-text font-poppins text-3xl font-bold text-transparent">
-            {mockGroup.memberCount}
+            {group.memberCount}
           </p>
           <p className="font-nunito text-xs text-muted">group members</p>
         </div>
@@ -96,15 +149,21 @@ export default function GroupsOverviewCard() {
             </span>
           </div>
           <div className="mt-2 flex flex-col gap-1">
-            {mockGroup.roles.map((r) => (
-              <div
-                key={r.role}
-                className="flex items-center justify-between font-nunito text-sm"
-              >
-                <span className="text-muted">{r.role}</span>
-                <span className="font-bold text-primary">{r.count}</span>
-              </div>
-            ))}
+            {roles.length > 0 ? (
+              roles.map((r) => (
+                <div
+                  key={r.role}
+                  className="flex items-center justify-between font-nunito text-sm"
+                >
+                  <span className="text-muted">{r.label}</span>
+                  <span className="font-bold text-primary">{r.count}</span>
+                </div>
+              ))
+            ) : (
+              <span className="font-nunito text-sm text-muted">
+                No members yet
+              </span>
+            )}
           </div>
         </div>
       </div>
