@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Archive, Plus, CheckCircle2, Clock, TriangleAlert } from "lucide-react";
 import { CommitmentType } from "@/app/lib/commitments";
 import CommitmentModal from "@/app/components/CommitmentModal";
@@ -24,6 +24,7 @@ import {
   isPastEvaluation,
 } from "@/app/lib/services/commitments";
 import { COMMITMENT_TYPES } from "@/app/lib/commitments";
+import { postCommitmentToFeed } from "@/app/lib/services/feed";
 
 const statusStyles = {
   pending: {
@@ -54,6 +55,7 @@ export default function CommitmentCard() {
   const [evaluationTime, setEvaluationTime] = useState("23:59");
   const [loading, setLoading] = useState(true);
   const [reloadKey, setReloadKey] = useState(0);
+  const profileIdRef = useRef<string | null>(null);
 
   useEffect(() => {
     const loadCommitments = async () => {
@@ -74,6 +76,8 @@ export default function CommitmentCard() {
         setLoading(false);
         return;
       }
+
+      profileIdRef.current = profile.id;
 
       const profileEvalTime = toHHMM(profile.evaluation_time);
       if (profile.evaluation_time) {
@@ -120,6 +124,15 @@ export default function CommitmentCard() {
 
   const handleSubmit = async (id: string, status: string) => {
     await submitCommitment(id, status);
+
+    if (status === "submitted" && selected?.id === id && profileIdRef.current) {
+      await postCommitmentToFeed({
+        profileId: profileIdRef.current,
+        commitmentId: id,
+        title: selected.title,
+        type: "submitted",
+      });
+    }
 
     setSelected(null);
     setReloadKey((k) => k + 1);

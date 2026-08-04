@@ -13,6 +13,7 @@ import {
   createCommitment,
   hasDuplicateTitle,
 } from "@/app/lib/services/commitments";
+import { postCommitmentToFeed } from "@/app/lib/services/feed";
 import DatePicker from "@/app/components/DatePicker";
 import ErrorModal from "@/app/components/ErrorModal";
 
@@ -123,6 +124,13 @@ export default function CommitmentModal({ open, type, evaluationTime, existingTi
       setError(insertError.message);
       return;
     }
+
+    await postCommitmentToFeed({
+      profileId: profile.id,
+      commitmentId: inserted.id,
+      title: inserted.title,
+      type: "created",
+    });
 
     const typeLabel =
       COMMITMENT_TYPES.find((t) => t.value === type)?.label ?? "Routine";
