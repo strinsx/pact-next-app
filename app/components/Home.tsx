@@ -6,7 +6,9 @@ import StatCards from "@/app/components/StatCards";
 import CommitmentCard from "@/app/components/CommitmentCard";
 import MonthlyAnalysisCard from "@/app/components/MonthlyAnalysisCard";
 import WeeklyAnalysisCard from "@/app/components/WeeklyAnalysisCard";
+import YearlyHeatmapCard from "@/app/components/YearlyHeatmapCard";
 import GroupFeedCard from "@/app/components/GroupFeedCard";
+import GroupFeedbackCard from "@/app/components/GroupFeedbackCard";
 import { getCurrentUser } from "@/app/lib/services/auth";
 
 export default function Home() {
@@ -52,9 +54,19 @@ export default function Home() {
           <div className="mt-2 w-full">
             <CommitmentCard />
           </div>
-          <div className="mt-2 flex w-full justify-center gap-4">
-            <MonthlyAnalysisCard />
-            <WeeklyAnalysisCard />
+          <div id="analytics" className="w-full scroll-mt-4">
+            <div className="mt-2 flex w-full justify-center gap-4">
+              <MonthlyAnalysisCard />
+              <WeeklyAnalysisCard />
+            </div>
+            <div className="mt-2 flex w-full gap-4">
+              <div className="w-[70%]">
+                <YearlyHeatmapCard />
+              </div>
+              <div className="w-[30%]">
+                <GroupFeedbackCard />
+              </div>
+            </div>
           </div>
           <div className="mt-2 w-full">
             <GroupFeedCard />

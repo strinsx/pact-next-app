@@ -2,18 +2,14 @@
 
 import { CheckCircle2 } from "lucide-react";
 import { useEffect, useState } from "react";
-import AreaChart from "@/app/components/AreaChart";
 import { getCurrentUser } from "@/app/lib/services/auth";
 import { getProfileByUserId } from "@/app/lib/services/profile";
-import { getSubmittedCommitmentsBetween } from "@/app/lib/services/commitments";
+import {
+  getWeeklyCommitmentBreakdown,
+  formatLocalDate,
+  WeeklyDayBreakdown,
+} from "@/app/lib/services/commitments";
 import { subscribeDataChanged } from "@/app/lib/events";
-
-interface DayDatum {
-  label: string;
-  value: number;
-}
-
-const DAY_LABELS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 const startOfWeek = () => {
   const now = new Date();
@@ -27,14 +23,8 @@ const startOfWeek = () => {
   return monday;
 };
 
-const endOfWeek = (monday: Date) => {
-  const sunday = new Date(monday);
-  sunday.setDate(sunday.getDate() + 7);
-  return sunday;
-};
-
 export default function DailyCommitmentsCard() {
-  const [data, setData] = useState<DayDatum[]>([]);
+  const [data, setData] = useState<WeeklyDayBreakdown[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
 
@@ -54,40 +44,21 @@ export default function DailyCommitmentsCard() {
       }
 
       const monday = startOfWeek();
-      const sunday = endOfWeek(monday);
-
-      const { data: rows } = await getSubmittedCommitmentsBetween(
+      const breakdown = await getWeeklyCommitmentBreakdown(
         profile.id,
-        monday.toISOString(),
-        sunday.toISOString()
+        formatLocalDate(monday)
       );
 
-      const counts = new Array(7).fill(0) as number[];
-
-      for (const row of rows ?? []) {
-        if (!row.submitted_at) continue;
-        const day = new Date(row.submitted_at);
-        const diff = Math.floor(
-          (day.getTime() - monday.getTime()) / 86400000
-        );
-        if (diff >= 0 && diff < 7) {
-          counts[diff] += 1;
-        }
-      }
-
-      setData(
-        DAY_LABELS.map((label, i) => ({
-          label,
-          value: counts[i],
-        }))
-      );
-      setTotal(counts.reduce((sum, count) => sum + count, 0));
+      setData(breakdown);
+      setTotal(breakdown.reduce((sum, d) => sum + d.submitted, 0));
       setLoading(false);
     };
 
     loadDailyData();
     return subscribeDataChanged(loadDailyData);
   }, []);
+
+  const maxCount = Math.max(1, ...data.map((d) => d.submitted + d.missed));
 
   return (
     <div className="w-full flex-1 rounded-2xl border-1 border-border bg-surface p-6">
@@ -100,15 +71,46 @@ export default function DailyCommitmentsCard() {
           {loading ? "..." : `${total} completed`}
         </span>
       </div>
-      <div className="mt-6">
-        <AreaChart data={data} from="#38bdf8" to="#a37af7" id="dailyGrad" />
-        <div className="mt-2 flex justify-between">
-          {DAY_LABELS.map((day) => (
-            <span key={day} className="font-nunito text-xs text-muted">
-              {day}
-            </span>
-          ))}
-        </div>
+      <div className="mt-3 flex items-center gap-4">
+        <span className="flex items-center gap-1.5 font-nunito text-xs text-muted">
+          <span className="h-2.5 w-2.5 rounded-sm bg-teal" />
+          Submitted
+        </span>
+        <span className="flex items-center gap-1.5 font-nunito text-xs text-muted">
+          <span className="h-2.5 w-2.5 rounded-sm bg-red-500" />
+          Missed
+        </span>
+      </div>
+      <div className="mt-4 flex items-end gap-3">
+        {data.map((day) => {
+          const totalDay = day.submitted + day.missed;
+          return (
+            <div
+              key={day.label}
+              className="flex flex-1 flex-col items-center gap-2"
+            >
+              <div className="flex h-36 w-10 flex-col justify-end overflow-hidden rounded-lg bg-border/30">
+                {totalDay > 0 && (
+                  <>
+                    <div
+                      style={{
+                        height: `${(day.submitted / maxCount) * 100}%`,
+                      }}
+                      className="w-full bg-teal"
+                    />
+                    <div
+                      style={{ height: `${(day.missed / maxCount) * 100}%` }}
+                      className="w-full bg-red-500"
+                    />
+                  </>
+                )}
+              </div>
+              <span className="font-nunito text-xs text-muted">
+                {day.label}
+              </span>
+            </div>
+          );
+        })}
       </div>
     </div>
   );

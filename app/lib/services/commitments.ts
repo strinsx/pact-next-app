@@ -152,6 +152,163 @@ export async function getSubmittedCommitmentsBetween(
     .lt("submitted_at", to);
 }
 
+export interface WeeklyDayBreakdown {
+  label: string;
+  submitted: number;
+  missed: number;
+}
+
+const toLocalDateKey = (iso: string) => {
+  const d = new Date(iso);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(
+    d.getDate()
+  ).padStart(2, "0")}`;
+};
+
+export async function getWeeklyCommitmentBreakdown(
+  profileId: string,
+  from: string
+): Promise<WeeklyDayBreakdown[]> {
+  const supabase = createClient();
+  const { data: rows } = await supabase
+    .from("commitments")
+    .select("status, commitment_date, evaluation_time, submitted_at")
+    .eq("profile_id", profileId);
+
+  const all = (rows ?? []) as {
+    status: string;
+    commitment_date: string;
+    evaluation_time: string | null;
+    submitted_at: string | null;
+  }[];
+
+  const submittedPerDay = new Map<string, number>();
+  const missedPerDay = new Map<string, number>();
+
+  for (const row of all) {
+    if (row.status === "submitted" && row.submitted_at) {
+      const day = toLocalDateKey(row.submitted_at);
+      submittedPerDay.set(day, (submittedPerDay.get(day) ?? 0) + 1);
+      continue;
+    }
+
+    const effectiveStatus =
+      row.status === "pending" &&
+      isPastEvaluation(row.commitment_date, toHHMM(row.evaluation_time))
+        ? "missed"
+        : row.status;
+
+    if (effectiveStatus === "missed") {
+      const day = row.commitment_date.slice(0, 10);
+      missedPerDay.set(day, (missedPerDay.get(day) ?? 0) + 1);
+    }
+  }
+
+  const result: WeeklyDayBreakdown[] = [];
+  const start = new Date(`${from}T00:00:00`);
+
+  for (let i = 0; i < 7; i++) {
+    const day = new Date(start);
+    day.setDate(day.getDate() + i);
+    const key = formatLocalDate(day);
+    result.push({
+      label: day.toLocaleString("en", { weekday: "short" }),
+      submitted: submittedPerDay.get(key) ?? 0,
+      missed: missedPerDay.get(key) ?? 0,
+    });
+  }
+
+  return result;
+}
+
+export interface ConsistencyDay {
+  date: string;
+  value: number;
+  submitted: number;
+  missed: number;
+}
+
+export interface ConsistencyWeek {
+  label: string;
+  days: ConsistencyDay[];
+}
+
+export async function getYearlyConsistency(
+  profileId: string,
+  weeks = 52
+): Promise<ConsistencyWeek[]> {
+  const supabase = createClient();
+  const { data: rows } = await supabase
+    .from("commitments")
+    .select("status, commitment_date, evaluation_time")
+    .eq("profile_id", profileId);
+
+  const all = (rows ?? []) as {
+    status: string;
+    commitment_date: string;
+    evaluation_time: string | null;
+  }[];
+
+  const byDay = new Map<string, { submitted: number; missed: number }>();
+  for (const row of all) {
+    const effectiveStatus =
+      row.status === "pending" &&
+      isPastEvaluation(row.commitment_date, toHHMM(row.evaluation_time))
+        ? "missed"
+        : row.status;
+
+    if (effectiveStatus !== "submitted" && effectiveStatus !== "missed") {
+      continue;
+    }
+
+    const day = row.commitment_date.slice(0, 10);
+    const entry = byDay.get(day) ?? { submitted: 0, missed: 0 };
+    if (effectiveStatus === "submitted") entry.submitted += 1;
+    else entry.missed += 1;
+    byDay.set(day, entry);
+  }
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const currentMonday = new Date(today);
+  currentMonday.setDate(today.getDate() - ((today.getDay() + 6) % 7));
+
+  const fmt = (d: Date) =>
+    d.toLocaleString("en", { month: "short", day: "numeric" });
+
+  const result: ConsistencyWeek[] = [];
+
+  for (let w = weeks - 1; w >= 0; w--) {
+    const weekStart = new Date(currentMonday);
+    weekStart.setDate(weekStart.getDate() - w * 7);
+
+    const days: ConsistencyDay[] = [];
+
+    for (let i = 0; i < 7; i++) {
+      const day = new Date(weekStart);
+      day.setDate(day.getDate() + i);
+
+      const key = formatLocalDate(day);
+      const entry = byDay.get(key);
+      const evaluated = entry ? entry.submitted + entry.missed : 0;
+      const value =
+        evaluated > 0 ? Math.round((entry!.submitted / evaluated) * 100) : 0;
+
+      days.push({
+        date: key,
+        value,
+        submitted: entry?.submitted ?? 0,
+        missed: entry?.missed ?? 0,
+      });
+    }
+
+    result.push({ label: fmt(weekStart), days });
+  }
+
+  return result;
+}
+
 export interface WeeklyConsistencyDatum {
   label: string;
   value: number;
@@ -219,21 +376,13 @@ export interface ProfileStats {
   dayStreak: number;
 }
 
-export async function getProfileStats(
-  profileId: string
-): Promise<ProfileStats> {
-  const supabase = createClient();
-  const { data: rows } = await supabase
-    .from("commitments")
-    .select("status, commitment_date, evaluation_time")
-    .eq("profile_id", profileId);
+interface StatsRow {
+  status: string;
+  commitment_date: string;
+  evaluation_time: string | null;
+}
 
-  const all = (rows ?? []) as {
-    status: string;
-    commitment_date: string;
-    evaluation_time: string | null;
-  }[];
-
+function computeProfileStats(all: StatsRow[], asOf: Date): ProfileStats {
   let submittedCount = 0;
   let missedCount = 0;
 
@@ -265,7 +414,7 @@ export async function getProfileStats(
     evaluated > 0 ? Math.round((submittedCount / evaluated) * 100) : 0;
 
   let dayStreak = 0;
-  const cursor = new Date();
+  const cursor = new Date(asOf);
   cursor.setHours(0, 0, 0, 0);
 
   for (let i = 0; i < 10000; i++) {
@@ -292,4 +441,156 @@ export async function getProfileStats(
   }
 
   return { completionRate, submittedCount, dayStreak };
+}
+
+const addDays = (date: Date, days: number) => {
+  const result = new Date(date);
+  result.setDate(result.getDate() + days);
+  return result;
+};
+
+const startOfWeekDate = (date: Date) => {
+  const d = new Date(date);
+  d.setHours(0, 0, 0, 0);
+  d.setDate(d.getDate() - ((d.getDay() + 6) % 7));
+  return d;
+};
+
+function dailyConsistencyAvg(
+  all: StatsRow[],
+  weekStart: Date
+): number {
+  const byDay = new Map<string, { done: number; missed: number }>();
+  for (const row of all) {
+    const day = row.commitment_date.slice(0, 10);
+    const entry = byDay.get(day) ?? { done: 0, missed: 0 };
+    if (row.status === "submitted") entry.done += 1;
+    else if (row.status === "missed") entry.missed += 1;
+    byDay.set(day, entry);
+  }
+
+  let sum = 0;
+  for (let i = 0; i < 7; i++) {
+    const day = addDays(weekStart, i);
+    const entry = byDay.get(formatLocalDate(day));
+    const evaluated = entry ? entry.done + entry.missed : 0;
+    sum += evaluated > 0 ? entry!.done / evaluated : 0;
+  }
+  return Math.round((sum / 7) * 100);
+}
+
+export interface PeriodStat {
+  current: number;
+  previous: number;
+  delta: number | null;
+}
+
+export interface StatsWithDelta {
+  overall: ProfileStats;
+  completionRate: PeriodStat;
+  submittedCount: PeriodStat;
+  weekSubmitted: PeriodStat;
+  weekAvg: PeriodStat;
+}
+
+const pctDelta = (current: number, previous: number): number | null =>
+  previous === 0 ? null : Math.round(((current - previous) / previous) * 100);
+
+export async function getProfileStats(
+  profileId: string
+): Promise<ProfileStats> {
+  const supabase = createClient();
+  const { data: rows } = await supabase
+    .from("commitments")
+    .select("status, commitment_date, evaluation_time")
+    .eq("profile_id", profileId);
+
+  const all = (rows ?? []) as StatsRow[];
+  return computeProfileStats(all, new Date());
+}
+
+export async function getStatsWithDelta(
+  profileId: string
+): Promise<StatsWithDelta> {
+  const supabase = createClient();
+  const { data: rows } = await supabase
+    .from("commitments")
+    .select("status, commitment_date, evaluation_time")
+    .eq("profile_id", profileId);
+
+  const all = (rows ?? []) as StatsRow[];
+  const now = new Date();
+
+  const monday = startOfWeekDate(now);
+  const thisWeekFrom = formatLocalDate(monday);
+  const thisWeekTo = formatLocalDate(addDays(monday, 7));
+  const lastWeekFrom = formatLocalDate(addDays(monday, -7));
+  const lastWeekTo = thisWeekFrom;
+
+  const thisMonthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+  const prevMonthStart = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+  const nextMonthStart = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+
+  const thisMonthFrom = formatLocalDate(thisMonthStart);
+  const prevMonthFrom = formatLocalDate(prevMonthStart);
+  const thisMonthTo = formatLocalDate(nextMonthStart);
+
+  const inRange = (from: string, to: string) =>
+    all.filter(
+      (row) =>
+        row.commitment_date >= from && row.commitment_date < to
+    );
+
+  const thisWeekStats = computeProfileStats(
+    inRange(thisWeekFrom, thisWeekTo),
+    now
+  );
+  const lastWeekStats = computeProfileStats(
+    inRange(lastWeekFrom, lastWeekTo),
+    now
+  );
+  const thisMonthStats = computeProfileStats(
+    inRange(thisMonthFrom, thisMonthTo),
+    now
+  );
+  const lastMonthStats = computeProfileStats(
+    inRange(prevMonthFrom, thisMonthFrom),
+    now
+  );
+
+  return {
+    overall: computeProfileStats(all, now),
+    completionRate: {
+      current: thisWeekStats.completionRate,
+      previous: lastWeekStats.completionRate,
+      delta: pctDelta(
+        thisWeekStats.completionRate,
+        lastWeekStats.completionRate
+      ),
+    },
+    submittedCount: {
+      current: thisMonthStats.submittedCount,
+      previous: lastMonthStats.submittedCount,
+      delta: pctDelta(
+        thisMonthStats.submittedCount,
+        lastMonthStats.submittedCount
+      ),
+    },
+    weekSubmitted: {
+      current: thisWeekStats.submittedCount,
+      previous: lastWeekStats.submittedCount,
+      delta: pctDelta(
+        thisWeekStats.submittedCount,
+        lastWeekStats.submittedCount
+      ),
+    },
+    weekAvg: {
+      current: dailyConsistencyAvg(all, monday),
+      previous: dailyConsistencyAvg(all, addDays(monday, -7)),
+      delta: pctDelta(
+        dailyConsistencyAvg(all, monday),
+        dailyConsistencyAvg(all, addDays(monday, -7))
+      ),
+    },
+  };
 }

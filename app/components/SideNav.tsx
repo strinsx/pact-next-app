@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState, useSyncExternalStore } from "react";
 import {
   LayoutDashboard,
@@ -18,15 +18,28 @@ import {
   UserPlus,
   PanelLeftClose,
   PanelLeftOpen,
+  type LucideIcon,
 } from "lucide-react";
 import { getCurrentUser, signOut } from "@/app/lib/services/auth";
 import { getProfileByUserId } from "@/app/lib/services/profile";
 import CreateGroupModal from "@/app/components/CreateGroupModal";
 import JoinGroupModal from "@/app/components/JoinGroupModal";
 
-const mainNav = [
+interface NavItem {
+  href: string;
+  label: string;
+  icon: LucideIcon;
+  scrollToId?: string;
+}
+
+const mainNav: NavItem[] = [
   { href: "/home", label: "Dashboard", icon: LayoutDashboard },
-  { href: "/analysis", label: "Analysis", icon: ChartColumn },
+  {
+    href: "/analysis",
+    label: "Analysis",
+    icon: ChartColumn,
+    scrollToId: "analytics",
+  },
   { href: "/profile", label: "Profile", icon: CircleUser },
 ];
 
@@ -82,8 +95,42 @@ const scrollToSection = (id: string) => {
   document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
 };
 
+let cachedAnalysisActive = false;
+
+function getAnalysisActive() {
+  if (typeof window === "undefined") return cachedAnalysisActive;
+
+  const el = document.getElementById("analytics");
+  const rect = el?.getBoundingClientRect();
+  const active = !!rect && rect.top <= 160 && rect.bottom > 0;
+  if (cachedAnalysisActive !== active) cachedAnalysisActive = active;
+  return cachedAnalysisActive;
+}
+
+const scrollToElement = (id: string) => {
+  const scroll = () =>
+    document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
+
+  if (document.getElementById(id)) {
+    scroll();
+    return;
+  }
+
+  let attempts = 0;
+  const interval = window.setInterval(() => {
+    attempts += 1;
+    if (document.getElementById(id)) {
+      window.clearInterval(interval);
+      scroll();
+    } else if (attempts > 20) {
+      window.clearInterval(interval);
+    }
+  }, 100);
+};
+
 export default function SideNav() {
   const pathname = usePathname();
+  const router = useRouter();
   const [collapsed, setCollapsed] = useState(false);
   const [fullName, setFullName] = useState<string | null>(null);
   const [username, setUsername] = useState<string | null>(null);
@@ -95,6 +142,18 @@ export default function SideNav() {
     getActiveSection,
     getActiveSection
   );
+  const analysisActive = useSyncExternalStore(
+    subscribeToScroll,
+    getAnalysisActive,
+    getAnalysisActive
+  );
+
+  const handleAnalysisClick = () => {
+    if (pathname !== "/home") {
+      router.push("/home");
+    }
+    scrollToElement("analytics");
+  };
 
   useEffect(() => {
     const loadProfile = async () => {
@@ -196,26 +255,48 @@ export default function SideNav() {
       </div>
       <nav className="flex flex-col gap-2 px-3">
         {mainNav.map((item) => {
-          const isActive =
-            item.href === "/" ? pathname === "/" : pathname.startsWith(item.href);
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              title={item.label}
-              className={`flex items-center rounded-xl py-3 font-nunito text-sm font-semibold transition-colors ${
-                collapsed ? "justify-center px-0" : "justify-between px-4"
-              } ${
-                isActive
-                  ? "bg-gradient-to-r from-sky-400 to-purple text-white"
-                  : "text-muted hover:bg-border/50 hover:text-primary"
-              }`}
-            >
+          const isActive = item.scrollToId
+            ? analysisActive
+            : item.href === "/"
+              ? pathname === "/"
+              : pathname.startsWith(item.href) && !analysisActive;
+
+          const className = `flex items-center rounded-xl py-3 font-nunito text-sm font-semibold transition-colors ${
+            collapsed ? "justify-center px-0" : "justify-between px-4"
+          } ${
+            isActive
+              ? "bg-gradient-to-r from-sky-400 to-purple text-white"
+              : "text-muted hover:bg-border/50 hover:text-primary"
+          }`;
+
+          const content = (
+            <>
               <span className={`flex items-center gap-3 ${collapsed ? "px-0" : ""}`}>
                 <item.icon className="h-4 w-4 shrink-0" />
                 {!collapsed && item.label}
               </span>
               {!collapsed && <ChevronRight className="h-4 w-4 shrink-0" />}
+            </>
+          );
+
+          return item.scrollToId ? (
+            <button
+              key={item.href}
+              type="button"
+              onClick={handleAnalysisClick}
+              title={item.label}
+              className={`cursor-pointer ${className}`}
+            >
+              {content}
+            </button>
+          ) : (
+            <Link
+              key={item.href}
+              href={item.href}
+              title={item.label}
+              className={className}
+            >
+              {content}
             </Link>
           );
         })}
