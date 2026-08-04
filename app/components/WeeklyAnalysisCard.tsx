@@ -9,6 +9,7 @@ import {
   getWeeklyConsistency,
   WeeklyConsistencyDatum,
 } from "@/app/lib/services/commitments";
+import { subscribeDataChanged } from "@/app/lib/events";
 
 export default function WeeklyConsistencyCard() {
   const [data, setData] = useState<WeeklyConsistencyDatum[]>([]);
@@ -34,6 +35,7 @@ export default function WeeklyConsistencyCard() {
     };
 
     loadWeekly();
+    return subscribeDataChanged(loadWeekly);
   }, []);
 
   const avg =

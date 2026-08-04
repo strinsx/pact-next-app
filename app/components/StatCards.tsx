@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { getCurrentUser } from "@/app/lib/services/auth";
 import { getProfileByUserId } from "@/app/lib/services/profile";
 import { getProfileStats, ProfileStats } from "@/app/lib/services/commitments";
+import { subscribeDataChanged } from "@/app/lib/events";
 
 export default function StatCards() {
   const [stats, setStats] = useState<ProfileStats | null>(null);
@@ -30,6 +31,7 @@ export default function StatCards() {
     };
 
     loadStats();
+    return subscribeDataChanged(loadStats);
   }, []);
 
   const statItems = [

@@ -25,6 +25,7 @@ import {
 } from "@/app/lib/services/commitments";
 import { COMMITMENT_TYPES } from "@/app/lib/commitments";
 import { postCommitmentToFeed } from "@/app/lib/services/feed";
+import { emitDataChanged } from "@/app/lib/events";
 
 const statusStyles = {
   pending: {
@@ -136,6 +137,7 @@ export default function CommitmentCard() {
 
     setSelected(null);
     setReloadKey((k) => k + 1);
+    emitDataChanged();
   };
 
   const handleUpdate = async (
@@ -152,6 +154,7 @@ export default function CommitmentCard() {
         : prev
     );
     setReloadKey((k) => k + 1);
+    emitDataChanged();
   };
 
   const handleDelete = async (id: string) => {
@@ -159,6 +162,7 @@ export default function CommitmentCard() {
 
     setSelected(null);
     setReloadKey((k) => k + 1);
+    emitDataChanged();
   };
 
   const handleEvaluationTimeUpdate = async (time: string) => {
@@ -168,6 +172,7 @@ export default function CommitmentCard() {
     if (!user) return;
 
     await updateEvaluationTime(user.id, time);
+    emitDataChanged();
   };
 
   return (
@@ -275,6 +280,7 @@ export default function CommitmentCard() {
         onCreated={() => {
           setCreateOpen(false);
           setReloadKey((k) => k + 1);
+          emitDataChanged();
         }}
       />
       <StatusModalComponent
