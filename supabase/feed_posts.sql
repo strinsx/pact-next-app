@@ -10,8 +10,14 @@ create table public.feed_posts (
   constraint feed_posts_group_id_fkey foreign KEY (group_id) references public.groups (id) on delete CASCADE,
   constraint feed_posts_profile_id_fkey foreign KEY (profile_id) references public.profiles (id) on delete CASCADE,
   constraint feed_posts_commitment_id_fkey foreign KEY (commitment_id) references public.commitments (id) on delete SET NULL,
-  constraint feed_posts_type_check check ((type = any (array['created'::text, 'submitted'::text])))
+  constraint feed_posts_type_check check ((type = any (array['created'::text, 'submitted'::text, 'missed'::text])))
 ) TABLESPACE pg_default;
+
+-- Migration for existing databases (table already created with the old
+-- created/submitted-only constraint): run this in the Supabase SQL editor.
+--
+-- alter table public.feed_posts drop constraint feed_posts_type_check;
+-- alter table public.feed_posts add constraint feed_posts_type_check check ((type = any (array['created'::text, 'submitted'::text, 'missed'::text])));
 
 alter table public.feed_posts enable row level security;
 

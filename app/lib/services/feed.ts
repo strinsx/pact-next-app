@@ -3,7 +3,7 @@
 import { createClient } from "@/app/lib/supabase/client";
 import { getMyGroups } from "@/app/lib/services/groups";
 
-export type FeedPostType = "created" | "submitted";
+export type FeedPostType = "created" | "submitted" | "missed";
 
 export interface FeedPost {
   id: string;
@@ -28,10 +28,12 @@ export async function postCommitmentToFeed(event: FeedPostEvent) {
   const supabase = createClient();
   const content =
     event.type === "created"
-      ? `created a commitment "${event.title}"`
-      : `completed "${event.title}"`;
+      ? `created a commitment ${event.title}`
+      : event.type === "submitted"
+        ? `completed ${event.title}`
+        : `missed a commitment ${event.title}`;
 
-  await supabase.from("feed_posts").insert(
+  const { error } = await supabase.from("feed_posts").insert(
     groups.map((group) => ({
       group_id: group.id,
       profile_id: event.profileId,
@@ -40,6 +42,10 @@ export async function postCommitmentToFeed(event: FeedPostEvent) {
       content,
     }))
   );
+
+  if (error) {
+    console.error("[feed] failed to post to group feed:", error.message);
+  }
 }
 
 function formatTime(iso: string): string {
@@ -59,7 +65,10 @@ function formatTime(iso: string): string {
   return date.toLocaleDateString("en", { month: "short", day: "numeric" });
 }
 
-export async function getGroupFeed(profileId: string): Promise<FeedPost[]> {
+export async function getGroupFeed(
+  profileId: string,
+  limit = 50
+): Promise<FeedPost[]> {
   const groups = await getMyGroups(profileId);
   if (groups.length === 0) return [];
 
@@ -73,7 +82,8 @@ export async function getGroupFeed(profileId: string): Promise<FeedPost[]> {
       "group_id",
       groups.map((g) => g.id)
     )
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: false })
+    .limit(limit);
 
   interface FeedRow {
     id: string;

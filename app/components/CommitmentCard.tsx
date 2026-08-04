@@ -126,12 +126,16 @@ export default function CommitmentCard() {
   const handleSubmit = async (id: string, status: string) => {
     await submitCommitment(id, status);
 
-    if (status === "submitted" && selected?.id === id && profileIdRef.current) {
+    if (
+      (status === "submitted" || status === "missed") &&
+      selected?.id === id &&
+      profileIdRef.current
+    ) {
       await postCommitmentToFeed({
         profileId: profileIdRef.current,
         commitmentId: id,
         title: selected.title,
-        type: "submitted",
+        type: status === "submitted" ? "submitted" : "missed",
       });
     }
 

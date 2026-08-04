@@ -195,8 +195,19 @@ export default function GroupFeedCard() {
                     </span>
                   </div>
                 </div>
-                <p className="mt-3 font-nunito text-sm text-primary">
-                  <span className="font-bold">{post.name}</span> {post.content}
+                <p className="mt-3 font-nunito text-sm">
+                  <span className="font-bold text-primary">{post.name}</span>{" "}
+                  <span
+                    className={
+                      post.type === "submitted"
+                        ? "text-emerald-500"
+                        : post.type === "missed"
+                          ? "text-red-500"
+                          : "text-primary"
+                    }
+                  >
+                    {post.content}
+                  </span>
                 </p>
                 <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-border pt-3">
                   {Object.entries(post.reactions).map(([emoji, reaction]) => (
