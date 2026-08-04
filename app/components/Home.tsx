@@ -8,12 +8,10 @@ import MonthlyAnalysisCard from "@/app/components/MonthlyAnalysisCard";
 import WeeklyAnalysisCard from "@/app/components/WeeklyAnalysisCard";
 import GroupFeedCard from "@/app/components/GroupFeedCard";
 import { getCurrentUser } from "@/app/lib/services/auth";
-import { getProfileByUserId } from "@/app/lib/services/profile";
 
 export default function Home() {
   const router = useRouter();
   const [firstName, setFirstName] = useState("there");
-  const [username, setUsername] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -30,14 +28,6 @@ export default function Home() {
         setFirstName(fullName.trim().split(/\s+/)[0] || "there");
       }
 
-      const { data: profile } = await getProfileByUserId(user.id, "username");
-
-      if (!profile?.username) {
-        router.push("/auth/onboarding");
-        return;
-      }
-
-      setUsername(profile.username);
       setLoading(false);
     };
 
