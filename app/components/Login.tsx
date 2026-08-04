@@ -7,7 +7,6 @@ import { useState } from "react";
 import {
   signInWithEmail,
   signInWithGoogle,
-  getPostAuthDestination,
 } from "@/app/lib/services/auth";
 
 export default function Login() {
@@ -31,8 +30,7 @@ export default function Login() {
     }
 
     if (data.user) {
-      const destination = await getPostAuthDestination(data.user.id);
-      window.location.href = destination;
+      window.location.href = "/";
       return;
     }
 

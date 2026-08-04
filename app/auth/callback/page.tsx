@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
   getCurrentUser,
-  getPostAuthDestination,
 } from "@/app/lib/services/auth";
 import { getProfileByUserId, createProfile } from "@/app/lib/services/profile";
 
@@ -44,10 +43,7 @@ export default function AuthCallback() {
         }
       }
 
-      const destination = await getPostAuthDestination(user.id);
-      if (cancelled) return;
-
-      router.push(destination);
+      router.push("/");
     };
 
     handleCallback();
