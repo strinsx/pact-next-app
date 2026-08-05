@@ -182,7 +182,7 @@ export default function StatusModalComponent({
                 type="button"
                 onClick={handleSave}
                 disabled={!title.trim()}
-                className="flex-1 cursor-pointer rounded-lg border-1 border-border bg-white py-2 font-nunito font-bold text-primary shadow-sm transition-colors hover:bg-border/50 disabled:cursor-not-allowed disabled:opacity-60"
+                className="flex-1 cursor-pointer rounded-lg border-1 border-border bg-surface py-2 font-nunito font-bold text-primary shadow-sm transition-colors hover:bg-border/50 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 Save
               </button>

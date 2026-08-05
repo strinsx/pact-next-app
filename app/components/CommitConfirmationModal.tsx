@@ -82,7 +82,7 @@ export default function CommitConfirmationModal({
           <button
             type="button"
             onClick={onClose}
-            className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg border-1 border-border bg-white py-2 font-nunito font-bold text-muted shadow-sm transition-colors hover:bg-border/50"
+            className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg border-1 border-border bg-surface py-2 font-nunito font-bold text-muted shadow-sm transition-colors hover:bg-border/50"
           >
             Cancel
           </button>

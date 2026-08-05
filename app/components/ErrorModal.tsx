@@ -50,7 +50,7 @@ export default function ErrorModal({ open, message, onClose }: ErrorModalProps) 
         <button
           type="button"
           onClick={onClose}
-          className="mt-6 w-full cursor-pointer rounded-lg border-1 border-red-500/30 bg-white py-2 font-nunito font-bold text-red-500 shadow-sm transition-colors hover:bg-red-500/10"
+          className="mt-6 w-full cursor-pointer rounded-lg border-1 border-red-500/30 bg-surface py-2 font-nunito font-bold text-red-500 shadow-sm transition-colors hover:bg-red-500/10"
         >
           OK
         </button>
