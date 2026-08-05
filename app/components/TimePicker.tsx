@@ -146,7 +146,7 @@ export default function TimePicker({ value, onChange }: TimePickerProps) {
           <button
             type="button"
             onClick={handleUpdate}
-            className="w-full cursor-pointer rounded-lg border-1 border-border bg-white py-1.5 font-nunito text-sm font-bold text-primary shadow-sm transition-colors hover:bg-border/50"
+            className="w-full cursor-pointer rounded-lg border-1 border-border bg-surface py-1.5 font-nunito text-sm font-bold text-primary shadow-sm transition-colors hover:bg-border/50"
           >
             Update
           </button>

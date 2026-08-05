@@ -1,32 +1,46 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
   --background: #f6f7fc;
   --foreground: #171717;
+  --primary: #1f2a5a;
+  --secondary: #4a90f5;
+  --teal: #56d9c8;
+  --purple: #a37af7;
+  --muted: #5c6b8a;
+  --border: #e4e7f5;
+  --surface: #ffffff;
+  color-scheme: light;
+}
+
+.dark {
+  --background: #0e1230;
+  --foreground: #edeffb;
+  --primary: #edeffb;
+  --secondary: #4a90f5;
+  --teal: #56d9c8;
+  --purple: #a37af7;
+  --muted: #9aa3cc;
+  --border: #2c3168;
+  --surface: #171b42;
+  color-scheme: dark;
 }
 
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --color-primary: #1f2a5a;
-  --color-secondary: #4a90f5;
-  --color-teal: #56d9c8;
-  --color-purple: #a37af7;
-  --color-muted: #5c6b8a;
-  --color-border: #e4e7f5;
-  --color-surface: #ffffff;
+  --color-primary: var(--primary);
+  --color-secondary: var(--secondary);
+  --color-teal: var(--teal);
+  --color-purple: var(--purple);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-surface: var(--surface);
   --font-sans: var(--font-poppins);
   --font-nunito: var(--font-nunito);
 }
-
-/* Dark mode disabled until feature is added
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-*/
 
 body {
   background: var(--background);

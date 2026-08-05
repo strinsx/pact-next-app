@@ -91,9 +91,59 @@ export interface GroupOverview {
   description: string | null;
   invite_code: string;
   max_members: number;
+  owner_id: string;
+  isOwner: boolean;
   memberCount: number;
   pendingCount: number;
   roles: { role: string; count: number }[];
+  ownerProfile: { id: string; full_name: string | null; username: string | null } | null;
+}
+
+export interface GroupMember {
+  id: string;
+  profile_id: string;
+  role: string;
+  joined_at: string;
+  full_name: string | null;
+  username: string | null;
+}
+
+export async function getGroupMembers(groupId: string) {
+  const supabase = createClient();
+
+  const { data, error } = await supabase
+    .from("group_members")
+    .select(
+      "id, profile_id, role, joined_at, profiles(id, full_name, username)"
+    )
+    .eq("group_id", groupId)
+    .eq("status", "approved")
+    .order("joined_at", { ascending: true });
+
+  if (error) {
+    return { data: null, error: { message: error.message } };
+  }
+
+  const members: GroupMember[] = (data ?? []).map((row) => {
+    const embedded = Array.isArray(row.profiles)
+      ? row.profiles[0] ?? null
+      : row.profiles;
+    return {
+      id: row.id,
+      profile_id: row.profile_id,
+      role: row.role,
+      joined_at: row.joined_at,
+      full_name: embedded?.full_name ?? null,
+      username: embedded?.username ?? null,
+    };
+  });
+
+  return { data: members, error: null };
+}
+
+export async function kickMember(membershipId: string) {
+  const supabase = createClient();
+  return supabase.from("group_members").delete().eq("id", membershipId);
 }
 
 export async function joinGroupByInviteCode(
@@ -196,23 +246,82 @@ export async function getPendingJoinRequests(groupId: string) {
   return { data: pending, error: null };
 }
 
+export async function approveJoinRequest(membershipId: string) {
+  const supabase = createClient();
+  return supabase
+    .from("group_members")
+    .update({ status: "approved" })
+    .eq("id", membershipId);
+}
+
+export async function rejectJoinRequest(membershipId: string) {
+  const supabase = createClient();
+  return supabase.from("group_members").delete().eq("id", membershipId);
+}
+
 export async function getMyGroupOverview(profileId: string) {
   const supabase = createClient();
 
-  const { data: group } = await supabase
+  const { data: ownedGroup } = await supabase
     .from("groups")
-    .select("id, name, description, invite_code, max_members")
+    .select("id, name, description, invite_code, max_members, owner_id")
     .eq("owner_id", profileId)
     .maybeSingle();
 
+  let group = ownedGroup;
+  let isOwner = true;
+
+  if (!group) {
+    const { data: membership } = await supabase
+      .from("group_members")
+      .select(
+        "group_id, groups(id, name, description, invite_code, max_members, owner_id)"
+      )
+      .eq("profile_id", profileId)
+      .eq("status", "approved")
+      .maybeSingle();
+
+    const embedded = membership?.groups as
+      | {
+          id: string;
+          name: string;
+          description: string | null;
+          invite_code: string;
+          max_members: number;
+          owner_id: string;
+        }
+      | {
+          id: string;
+          name: string;
+          description: string | null;
+          invite_code: string;
+          max_members: number;
+          owner_id: string;
+        }[]
+      | null
+      | undefined;
+
+    group = Array.isArray(embedded) ? embedded[0] ?? null : embedded ?? null;
+    isOwner = false;
+  }
+
   if (!group) return null;
 
-  const { data: members } = await supabase
-    .from("group_members")
-    .select("role, status")
-    .eq("group_id", group.id);
+  const [membersResult, ownerResult] = await Promise.all([
+    supabase
+      .from("group_members")
+      .select("role, status")
+      .eq("group_id", group.id),
+    supabase
+      .from("profiles")
+      .select("id, full_name, username")
+      .eq("id", group.owner_id)
+      .maybeSingle(),
+  ]);
 
-  const approved = (members ?? []).filter((m) => m.status === "approved");
+  const members = membersResult.data ?? [];
+
+  const approved = members.filter((m) => m.status === "approved");
 
   const roleCounts: Record<string, number> = {};
   for (const member of approved) {
@@ -221,8 +330,19 @@ export async function getMyGroupOverview(profileId: string) {
 
   return {
     ...group,
+    isOwner,
+    ownerProfile: ownerResult.data,
     memberCount: approved.length,
-    pendingCount: (members ?? []).filter((m) => m.status === "pending").length,
+    pendingCount: members.filter((m) => m.status === "pending").length,
     roles: Object.entries(roleCounts).map(([role, count]) => ({ role, count })),
   };
+}
+
+export async function leaveGroup(groupId: string, profileId: string) {
+  const supabase = createClient();
+  return supabase
+    .from("group_members")
+    .delete()
+    .eq("group_id", groupId)
+    .eq("profile_id", profileId);
 }

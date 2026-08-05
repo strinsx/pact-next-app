@@ -6,19 +6,18 @@ import { createClient } from "@/app/lib/supabase/client";
 import { getCurrentUser } from "@/app/lib/services/auth";
 import { getProfileByUserId } from "@/app/lib/services/profile";
 import { getMyGroups, MyGroup } from "@/app/lib/services/groups";
-import { getGroupFeed, FeedPost } from "@/app/lib/services/feed";
+import { getGroupFeed, FeedPost, deleteExpiredFeedPosts } from "@/app/lib/services/feed";
+import {
+  getCommentsForCommitments,
+  addComment as insertComment,
+  FeedComment,
+} from "@/app/lib/services/comments";
 
 type Reactions = Record<string, { count: number; reacted: boolean }>;
 
-interface Comment {
-  id: string;
-  name: string;
-  text: string;
-}
-
 interface FeedItem extends FeedPost {
   reactions: Reactions;
-  comments: Comment[];
+  comments: FeedComment[];
 }
 
 const emojiPool = ["✅", "🔥", "👍", "❤️"];
@@ -29,6 +28,7 @@ export default function GroupFeedCard() {
   const [myGroups, setMyGroups] = useState<MyGroup[]>([]);
   const [loading, setLoading] = useState(true);
   const profileIdRef = useRef<string | null>(null);
+  const nameRef = useRef<string>("you");
   const groupsLoadedRef = useRef(false);
 
   const load = async () => {
@@ -36,9 +36,16 @@ export default function GroupFeedCard() {
     if (!user) return;
 
     if (!profileIdRef.current) {
-      const { data: profile } = await getProfileByUserId(user.id, "id");
+      const { data: profile } = await getProfileByUserId(
+        user.id,
+        "id, username, full_name"
+      );
       if (!profile) return;
       profileIdRef.current = profile.id;
+      nameRef.current =
+        profile.username ??
+        profile.full_name?.trim().split(/\s+/)[0] ??
+        "you";
     }
 
     const groups = await getMyGroups(profileIdRef.current);
@@ -49,6 +56,24 @@ export default function GroupFeedCard() {
     }
 
     const posts = await getGroupFeed(profileIdRef.current);
+    deleteExpiredFeedPosts();
+
+    const commitmentIds = [
+      ...new Set(
+        posts
+          .map((post) => post.commitment_id)
+          .filter((id): id is string => id !== null)
+      ),
+    ];
+
+    const comments = await getCommentsForCommitments(commitmentIds);
+
+    const commentsByCommitment = new Map<string, FeedComment[]>();
+    for (const comment of comments) {
+      const list = commentsByCommitment.get(comment.commitment_id) ?? [];
+      list.push(comment);
+      commentsByCommitment.set(comment.commitment_id, list);
+    }
 
     setItems((prev) =>
       posts.map((post) => {
@@ -56,7 +81,9 @@ export default function GroupFeedCard() {
         return {
           ...post,
           reactions: existing?.reactions ?? {},
-          comments: existing?.comments ?? [],
+          comments: post.commitment_id
+            ? (commentsByCommitment.get(post.commitment_id) ?? [])
+            : [],
         };
       })
     );
@@ -74,6 +101,13 @@ export default function GroupFeedCard() {
       .on(
         "postgres_changes",
         { event: "*", schema: "public", table: "feed_posts" },
+        () => {
+          if (!cancelled) load();
+        }
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "comments" },
         () => {
           if (!cancelled) load();
         }
@@ -125,21 +159,44 @@ export default function GroupFeedCard() {
     );
   };
 
-  const addComment = (id: string) => {
+  const addComment = async (id: string) => {
     const text = (commentDrafts[id] ?? "").trim();
-    if (!text) return;
+    if (!text || !profileIdRef.current) return;
+
+    const item = items.find((i) => i.id === id);
+    if (!item?.commitment_id) return;
+
+    const commitmentId = item.commitment_id;
+
+    const { data: inserted, error } = await insertComment(
+      commitmentId,
+      profileIdRef.current,
+      text
+    );
+
+    if (error) {
+      console.error("[feed] failed to add comment:", error.message);
+      return;
+    }
 
     setItems((prev) =>
-      prev.map((item) =>
-        item.id === id
+      prev.map((feedItem) =>
+        feedItem.id === id
           ? {
-              ...item,
+              ...feedItem,
               comments: [
-                ...item.comments,
-                { id: `${item.id}-${Date.now()}`, name: "you", text },
+                ...feedItem.comments,
+                {
+                  id: inserted.id,
+                  commitment_id: commitmentId,
+                  profile_id: profileIdRef.current!,
+                  text,
+                  created_at: new Date().toISOString(),
+                  name: nameRef.current,
+                },
               ],
             }
-          : item
+          : feedItem
       )
     );
     setCommentDrafts((prev) => ({ ...prev, [id]: "" }));

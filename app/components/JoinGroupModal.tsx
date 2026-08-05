@@ -132,7 +132,7 @@ export default function JoinGroupModal({
           <button
             type="submit"
             disabled={submitting}
-            className="mt-2 w-full cursor-pointer rounded-lg border-1 border-border bg-white py-2 font-nunito font-bold text-primary shadow-sm transition-colors hover:bg-border/50 disabled:cursor-not-allowed disabled:opacity-60"
+            className="mt-2 w-full cursor-pointer rounded-lg border-1 border-border bg-surface py-2 font-nunito font-bold text-primary shadow-sm transition-colors hover:bg-border/50 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {submitting ? "Joining..." : "Join Group"}
           </button>

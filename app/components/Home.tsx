@@ -5,8 +5,7 @@ import { useEffect, useState } from "react";
 import StatCards from "@/app/components/StatCards";
 import CommitmentCard from "@/app/components/CommitmentCard";
 import MonthlyAnalysisCard from "@/app/components/MonthlyAnalysisCard";
-import WeeklyAnalysisCard from "@/app/components/WeeklyAnalysisCard";
-import YearlyHeatmapCard from "@/app/components/YearlyHeatmapCard";
+import MonthlyConsistencyCard from "@/app/components/MonthlyConsistencyCard";import YearlyHeatmapCard from "@/app/components/YearlyHeatmapCard";
 import GroupFeedCard from "@/app/components/GroupFeedCard";
 import GroupFeedbackCard from "@/app/components/GroupFeedbackCard";
 import { getCurrentUser } from "@/app/lib/services/auth";
@@ -46,7 +45,7 @@ export default function Home() {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <main className="flex flex-1 flex-col px-4 py-10 text-center">
+      <main className="flex flex-1 flex-col px-4 pt-20 pb-10 text-center md:pt-10">
         <div className="m-auto flex w-full max-w-7xl flex-col items-center gap-2 mt-10">
           <div className="mt-6 w-full">
             <StatCards />
@@ -55,11 +54,11 @@ export default function Home() {
             <CommitmentCard />
           </div>
           <div id="analytics" className="w-full scroll-mt-4">
-            <div className="mt-2 flex w-full justify-center gap-4">
+            <div className="mt-2 flex w-full flex-col justify-center gap-4 md:flex-row">
               <MonthlyAnalysisCard />
-              <WeeklyAnalysisCard />
+              <MonthlyConsistencyCard />
             </div>
-            <div className="mt-2 flex w-full gap-4">
+            <div className="mt-2 hidden w-full gap-4 md:flex">
               <div className="w-[70%]">
                 <YearlyHeatmapCard />
               </div>

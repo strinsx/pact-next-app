@@ -156,6 +156,7 @@ export interface WeeklyDayBreakdown {
   label: string;
   submitted: number;
   missed: number;
+  pending: number;
 }
 
 const toLocalDateKey = (iso: string) => {
@@ -184,6 +185,7 @@ export async function getWeeklyCommitmentBreakdown(
 
   const submittedPerDay = new Map<string, number>();
   const missedPerDay = new Map<string, number>();
+  const pendingPerDay = new Map<string, number>();
 
   for (const row of all) {
     if (row.status === "submitted" && row.submitted_at) {
@@ -198,9 +200,12 @@ export async function getWeeklyCommitmentBreakdown(
         ? "missed"
         : row.status;
 
+    const day = row.commitment_date.slice(0, 10);
+
     if (effectiveStatus === "missed") {
-      const day = row.commitment_date.slice(0, 10);
       missedPerDay.set(day, (missedPerDay.get(day) ?? 0) + 1);
+    } else if (effectiveStatus === "pending") {
+      pendingPerDay.set(day, (pendingPerDay.get(day) ?? 0) + 1);
     }
   }
 
@@ -215,6 +220,7 @@ export async function getWeeklyCommitmentBreakdown(
       label: day.toLocaleString("en", { weekday: "short" }),
       submitted: submittedPerDay.get(key) ?? 0,
       missed: missedPerDay.get(key) ?? 0,
+      pending: pendingPerDay.get(key) ?? 0,
     });
   }
 
@@ -370,6 +376,58 @@ export async function getWeeklyConsistency(
 }
 
 
+export interface MonthlyConsistencyDatum {
+  label: string;
+  value: number;
+}
+
+export async function getMonthlyConsistency(
+  profileId: string
+): Promise<MonthlyConsistencyDatum[]> {
+  const supabase = createClient();
+  const { data: rows } = await supabase
+    .from("commitments")
+    .select("status, commitment_date")
+    .eq("profile_id", profileId)
+    .order("commitment_date", { ascending: true });
+
+  const all = (rows ?? []) as { status: string; commitment_date: string }[];
+
+  const now = new Date();
+
+  const result: MonthlyConsistencyDatum[] = [];
+
+  for (let i = 11; i >= 0; i--) {
+    const monthStart = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const monthEnd = new Date(now.getFullYear(), now.getMonth() - i + 1, 1);
+    const from = formatLocalDate(monthStart);
+    const to = formatLocalDate(monthEnd);
+
+    let done = 0;
+    let evaluated = 0;
+
+    for (const row of all) {
+      const day = row.commitment_date.slice(0, 10);
+      if (day < from || day >= to) continue;
+      if (row.status === "submitted") {
+        done += 1;
+        evaluated += 1;
+      } else if (row.status === "missed") {
+        evaluated += 1;
+      }
+    }
+
+    const value = evaluated > 0 ? Math.round((done / evaluated) * 100) : 0;
+    result.push({
+      label: monthStart.toLocaleString("en", { month: "short" }),
+      value,
+    });
+  }
+
+  return result;
+}
+
+
 export interface ProfileStats {
   completionRate: number;
   submittedCount: number;
@@ -388,7 +446,7 @@ function computeProfileStats(all: StatsRow[], asOf: Date): ProfileStats {
 
   const byDay = new Map<
     string,
-    { total: number; done: number; hasPending: boolean }
+    { done: number; hasPending: boolean }
   >();
 
   for (const row of all) {
@@ -402,8 +460,7 @@ function computeProfileStats(all: StatsRow[], asOf: Date): ProfileStats {
     else if (effectiveStatus === "missed") missedCount += 1;
 
     const day = row.commitment_date.slice(0, 10);
-    const entry = byDay.get(day) ?? { total: 0, done: 0, hasPending: false };
-    entry.total += 1;
+    const entry = byDay.get(day) ?? { done: 0, hasPending: false };
     if (effectiveStatus === "submitted") entry.done += 1;
     if (effectiveStatus === "pending") entry.hasPending = true;
     byDay.set(day, entry);
@@ -426,7 +483,7 @@ function computeProfileStats(all: StatsRow[], asOf: Date): ProfileStats {
       continue;
     }
 
-    if (entry.done === entry.total) {
+    if (entry.done > 0) {
       dayStreak += 1;
       cursor.setDate(cursor.getDate() - 1);
       continue;

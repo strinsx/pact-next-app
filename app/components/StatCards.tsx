@@ -61,7 +61,7 @@ export default function StatCards() {
         {statItems.map((stat) => (
           <div
             key={stat.label}
-            className="flex w-100 flex-col gap-2 rounded-2xl border-1 border-border bg-surface p-6 text-left"
+            className="flex w-full flex-col gap-2 rounded-2xl border-1 border-border bg-surface p-6 text-left sm:w-100"
           >
             <stat.icon className="h-5 w-5 text-muted" />
             <span className="bg-gradient-to-r from-purple to-secondary bg-clip-text font-poppins text-3xl font-bold text-transparent">

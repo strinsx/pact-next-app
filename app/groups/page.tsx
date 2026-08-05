@@ -8,7 +8,7 @@ export default function GroupsPage() {
     <div className="flex min-h-screen">
       <SideNav />
       <main className="flex-1">
-        <div className="m-auto flex w-full max-w-7xl flex-col items-center gap-2 mt-10 px-4">
+        <div className="m-auto flex w-full max-w-7xl flex-col items-center gap-2 mt-10 px-4 pt-10 md:pt-0">
           <div id="overview" className="mt-6 w-full scroll-mt-24">
             <GroupsOverviewCard />
           </div>
