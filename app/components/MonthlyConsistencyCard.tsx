@@ -6,17 +6,17 @@ import AreaChart from "@/app/components/AreaChart";
 import { getCurrentUser } from "@/app/lib/services/auth";
 import { getProfileByUserId } from "@/app/lib/services/profile";
 import {
-  getWeeklyConsistency,
-  WeeklyConsistencyDatum,
+  getMonthlyConsistency,
+  MonthlyConsistencyDatum,
 } from "@/app/lib/services/commitments";
 import { subscribeDataChanged } from "@/app/lib/events";
 
-export default function WeeklyConsistencyCard() {
-  const [data, setData] = useState<WeeklyConsistencyDatum[]>([]);
+export default function MonthlyConsistencyCard() {
+  const [data, setData] = useState<MonthlyConsistencyDatum[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const loadWeekly = async () => {
+    const loadMonthly = async () => {
       const user = await getCurrentUser();
       if (!user) {
         setLoading(false);
@@ -30,12 +30,12 @@ export default function WeeklyConsistencyCard() {
         return;
       }
 
-      setData(await getWeeklyConsistency(profile.id));
+      setData(await getMonthlyConsistency(profile.id));
       setLoading(false);
     };
 
-    loadWeekly();
-    return subscribeDataChanged(loadWeekly);
+    loadMonthly();
+    return subscribeDataChanged(loadMonthly);
   }, []);
 
   const avg =
@@ -49,7 +49,7 @@ export default function WeeklyConsistencyCard() {
     <div className="w-full flex-1 rounded-2xl border-1 border-border bg-surface p-6">
       <div className="flex items-center justify-between">
         <h2 className="font-poppins text-xl font-bold text-primary">
-          Weekly Consistency
+          Monthly Consistency
         </h2>
         <span className="flex items-center gap-2 rounded-full bg-purple/10 px-3 py-1 font-nunito text-xs font-bold text-purple">
           <Flame className="h-3.5 w-3.5" />
@@ -61,12 +61,12 @@ export default function WeeklyConsistencyCard() {
           data={data}
           from="#56d9c8"
           to="#4a90f5"
-          id="weeklyGrad"
+          id="monthlyGrad"
         />
         <div className="mt-2 flex justify-between">
-          {data.map((week) => (
-            <span key={week.label} className="font-nunito text-xs text-muted">
-              {week.label}
+          {data.map((month) => (
+            <span key={month.label} className="font-nunito text-xs text-muted">
+              {month.label}
             </span>
           ))}
         </div>

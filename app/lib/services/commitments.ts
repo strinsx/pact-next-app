@@ -370,6 +370,58 @@ export async function getWeeklyConsistency(
 }
 
 
+export interface MonthlyConsistencyDatum {
+  label: string;
+  value: number;
+}
+
+export async function getMonthlyConsistency(
+  profileId: string
+): Promise<MonthlyConsistencyDatum[]> {
+  const supabase = createClient();
+  const { data: rows } = await supabase
+    .from("commitments")
+    .select("status, commitment_date")
+    .eq("profile_id", profileId)
+    .order("commitment_date", { ascending: true });
+
+  const all = (rows ?? []) as { status: string; commitment_date: string }[];
+
+  const now = new Date();
+
+  const result: MonthlyConsistencyDatum[] = [];
+
+  for (let i = 11; i >= 0; i--) {
+    const monthStart = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    const monthEnd = new Date(now.getFullYear(), now.getMonth() - i + 1, 1);
+    const from = formatLocalDate(monthStart);
+    const to = formatLocalDate(monthEnd);
+
+    let done = 0;
+    let evaluated = 0;
+
+    for (const row of all) {
+      const day = row.commitment_date.slice(0, 10);
+      if (day < from || day >= to) continue;
+      if (row.status === "submitted") {
+        done += 1;
+        evaluated += 1;
+      } else if (row.status === "missed") {
+        evaluated += 1;
+      }
+    }
+
+    const value = evaluated > 0 ? Math.round((done / evaluated) * 100) : 0;
+    result.push({
+      label: monthStart.toLocaleString("en", { month: "short" }),
+      value,
+    });
+  }
+
+  return result;
+}
+
+
 export interface ProfileStats {
   completionRate: number;
   submittedCount: number;
