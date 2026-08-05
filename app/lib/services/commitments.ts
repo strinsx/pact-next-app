@@ -483,7 +483,7 @@ function computeProfileStats(all: StatsRow[], asOf: Date): ProfileStats {
       continue;
     }
 
-    if (entry.done === entry.total) {
+    if (entry.done > 0) {
       dayStreak += 1;
       cursor.setDate(cursor.getDate() - 1);
       continue;
