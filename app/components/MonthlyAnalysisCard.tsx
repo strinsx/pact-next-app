@@ -58,10 +58,7 @@ export default function DailyCommitmentsCard() {
     return subscribeDataChanged(loadDailyData);
   }, []);
 
-  const maxCount = Math.max(1, ...data.map((d) => d.submitted + d.missed));
-
-  return (
-    <div className="w-full flex-1 rounded-2xl border-1 border-border bg-surface p-6">
+  return (    <div className="w-full flex-1 rounded-2xl border-1 border-border bg-surface p-6">
       <div className="flex items-center justify-between">
         <h2 className="font-poppins text-xl font-bold text-primary">
           Daily Commitments
@@ -80,27 +77,56 @@ export default function DailyCommitmentsCard() {
           <span className="h-2.5 w-2.5 rounded-sm bg-red-500" />
           Missed
         </span>
+        <span className="flex items-center gap-1.5 font-nunito text-xs text-muted">
+          <span className="h-2.5 w-2.5 rounded-sm bg-purple" />
+          Pending
+        </span>
       </div>
       <div className="mt-4 flex items-end gap-3">
         {data.map((day) => {
-          const totalDay = day.submitted + day.missed;
+          const totalDay = day.submitted + day.missed + day.pending;
           return (
             <div
               key={day.label}
-              className="flex flex-1 flex-col items-center gap-2"
+              className="group relative flex flex-1 flex-col items-center gap-2"
             >
-              <div className="flex h-36 w-10 flex-col justify-end overflow-hidden rounded-lg bg-border/30">
+              <div className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-2 hidden -translate-x-1/2 whitespace-nowrap rounded-lg border-1 border-border bg-surface px-3 py-2 text-left shadow-xl group-hover:block">
+                <p className="font-nunito text-xs font-bold text-primary">
+                  {day.label}
+                </p>
+                <p className="mt-0.5 flex items-center gap-1.5 font-nunito text-xs text-muted">
+                  <span className="h-2 w-2 rounded-sm bg-teal" />
+                  {day.submitted} completed
+                </p>
+                <p className="flex items-center gap-1.5 font-nunito text-xs text-muted">
+                  <span className="h-2 w-2 rounded-sm bg-red-500" />
+                  {day.missed} missed
+                </p>
+                <p className="flex items-center gap-1.5 font-nunito text-xs text-muted">
+                  <span className="h-2 w-2 rounded-sm bg-purple" />
+                  {day.pending} pending
+                </p>
+              </div>
+              <div className="flex h-36 w-10 flex-col justify-end overflow-hidden rounded-lg bg-border/30 shadow-[0_0_0_rgba(86,217,200,0)] transition-shadow duration-300 group-hover:shadow-[0_0_20px_rgba(86,217,200,0.6)]">
                 {totalDay > 0 && (
                   <>
                     <div
                       style={{
-                        height: `${(day.submitted / maxCount) * 100}%`,
+                        height: `${(day.submitted / totalDay) * 100}%`,
                       }}
                       className="w-full bg-teal"
                     />
                     <div
-                      style={{ height: `${(day.missed / maxCount) * 100}%` }}
+                      style={{
+                        height: `${(day.missed / totalDay) * 100}%`,
+                      }}
                       className="w-full bg-red-500"
+                    />
+                    <div
+                      style={{
+                        height: `${(day.pending / totalDay) * 100}%`,
+                      }}
+                      className="w-full bg-purple"
                     />
                   </>
                 )}
