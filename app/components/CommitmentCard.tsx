@@ -181,7 +181,7 @@ export default function CommitmentCard() {
 
   return (
     <div className="w-full rounded-2xl border-1 border-border bg-surface p-6">
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
         <div className="flex flex-col gap-1 text-left">
           <h2 className="font-poppins text-xl font-bold text-primary">
             Commitments for today
@@ -194,7 +194,7 @@ export default function CommitmentCard() {
             passes
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <TimePicker
             value={evaluationTime}
             onChange={handleEvaluationTimeUpdate}
@@ -210,7 +210,7 @@ export default function CommitmentCard() {
           <button
             type="button"
             onClick={() => setOptionsOpen(true)}
-            className="flex cursor-pointer items-center gap-2 rounded-lg border-1 border-border bg-white px-4 py-2 font-nunito text-sm font-bold text-primary shadow-sm transition-colors hover:bg-border/50"
+            className="flex cursor-pointer items-center gap-2 rounded-lg border-1 border-border bg-surface px-4 py-2 font-nunito text-sm font-bold text-primary shadow-sm transition-colors hover:bg-border/50"
           >
             <Plus className="h-4 w-4" />
             Create
