@@ -12,6 +12,7 @@ export interface FeedPost {
   content: string;
   time: string;
   type: FeedPostType;
+  commitment_id: string | null;
 }
 
 export interface FeedPostEvent {
@@ -48,6 +49,20 @@ export async function postCommitmentToFeed(event: FeedPostEvent) {
   }
 }
 
+export async function deleteExpiredFeedPosts() {
+  const supabase = createClient();
+  const cutoff = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+
+  const { error } = await supabase
+    .from("feed_posts")
+    .delete()
+    .lt("created_at", cutoff);
+
+  if (error) {
+    console.error("[feed] failed to delete expired posts:", error.message);
+  }
+}
+
 function formatTime(iso: string): string {
   const date = new Date(iso);
   const diff = Date.now() - date.getTime();
@@ -73,6 +88,7 @@ export async function getGroupFeed(
   if (groups.length === 0) return [];
 
   const supabase = createClient();
+  const since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
   const { data } = await supabase
     .from("feed_posts")
     .select(
@@ -82,6 +98,7 @@ export async function getGroupFeed(
       "group_id",
       groups.map((g) => g.id)
     )
+    .gte("created_at", since)
     .order("created_at", { ascending: false })
     .limit(limit);
 
@@ -90,6 +107,7 @@ export async function getGroupFeed(
     type: string;
     content: string;
     created_at: string;
+    commitment_id: string | null;
     groups: { name: string } | { name: string }[] | null;
     profiles:
       | { username: string | null; full_name: string | null }
@@ -119,6 +137,7 @@ export async function getGroupFeed(
       content: row.content,
       time: formatTime(row.created_at),
       type: row.type as FeedPostType,
+      commitment_id: row.commitment_id,
     };
   });
 
