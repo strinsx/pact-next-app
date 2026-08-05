@@ -10,6 +10,7 @@ import {
   LayoutGrid,
   LogOut,
   Moon,
+  Sun,
   Plus,
   ChevronRight,
   Users,
@@ -18,12 +19,19 @@ import {
   UserPlus,
   PanelLeftClose,
   PanelLeftOpen,
+  Menu,
+  X,
   type LucideIcon,
 } from "lucide-react";
 import { getCurrentUser, signOut } from "@/app/lib/services/auth";
 import { getProfileByUserId } from "@/app/lib/services/profile";
+import { toHHMM } from "@/app/lib/services/commitments";
+import { CommitmentType } from "@/app/lib/commitments";
+import { useTheme, toggleTheme } from "@/app/lib/theme";
 import CreateGroupModal from "@/app/components/CreateGroupModal";
 import JoinGroupModal from "@/app/components/JoinGroupModal";
+import CommitmentOptionsModal from "@/app/components/CommitmentOptionsModal";
+import CommitmentModal from "@/app/components/CommitmentModal";
 
 interface NavItem {
   href: string;
@@ -131,12 +139,19 @@ const scrollToElement = (id: string) => {
 export default function SideNav() {
   const pathname = usePathname();
   const router = useRouter();
+  const theme = useTheme();
   const [collapsed, setCollapsed] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
   const [fullName, setFullName] = useState<string | null>(null);
   const [username, setUsername] = useState<string | null>(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [createGroupOpen, setCreateGroupOpen] = useState(false);
   const [joinGroupOpen, setJoinGroupOpen] = useState(false);
+  const [commitmentOptionsOpen, setCommitmentOptionsOpen] = useState(false);
+  const [commitmentOpen, setCommitmentOpen] = useState(false);
+  const [commitmentType, setCommitmentType] =
+    useState<CommitmentType>("standard");
+  const [evaluationTime, setEvaluationTime] = useState("23:59");
   const activeSection = useSyncExternalStore(
     subscribeToScroll,
     getActiveSection,
@@ -153,6 +168,7 @@ export default function SideNav() {
       router.push("/home");
     }
     scrollToElement("analytics");
+    setMobileOpen(false);
   };
 
   useEffect(() => {
@@ -162,12 +178,15 @@ export default function SideNav() {
 
       const { data: profile } = await getProfileByUserId(
         user.id,
-        "full_name, username"
+        "full_name, username, evaluation_time"
       );
 
       if (profile) {
         setFullName(profile.full_name);
         setUsername(profile.username);
+        if (profile.evaluation_time) {
+          setEvaluationTime(toHHMM(profile.evaluation_time));
+        }
       }
     };
 
@@ -183,18 +202,48 @@ export default function SideNav() {
     if (!confirmOpen) return;
 
     const handleKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setConfirmOpen(false);
+      if (e.key === "Escape") {
+        setConfirmOpen(false);
+        setMobileOpen(false);
+      }
     };
     window.addEventListener("keydown", handleKey);
     return () => window.removeEventListener("keydown", handleKey);
   }, [confirmOpen]);
 
+  useEffect(() => {
+    if (!mobileOpen) return;
+
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMobileOpen(false);
+    };
+    window.addEventListener("keydown", handleKey);
+    return () => window.removeEventListener("keydown", handleKey);
+  }, [mobileOpen]);
+
   return (
-    <aside
-      className={`sticky top-0 flex h-screen flex-col overflow-hidden border-r border-border bg-surface transition-all duration-300 ${
-        collapsed ? "w-20" : "w-64"
-      }`}
-    >
+    <>
+      {!mobileOpen && (
+        <button
+          type="button"
+          onClick={() => setMobileOpen(true)}
+          aria-label="Open menu"
+          className="fixed left-4 top-4 z-50 flex h-10 w-10 items-center justify-center rounded-lg border-1 border-border bg-surface text-primary shadow-md md:hidden"
+        >
+          <Menu className="h-5 w-5" />
+        </button>
+      )}
+      {mobileOpen && (
+        <div
+          className="fixed inset-0 z-30 bg-black/40 md:hidden"
+          onClick={() => setMobileOpen(false)}
+        />
+      )}
+      <aside
+        className={`fixed inset-y-0 z-40 flex h-screen w-64 flex-col overflow-hidden border-r border-border bg-surface transition-all duration-300 md:sticky md:top-0 md:left-auto md:z-auto md:h-screen ${
+          collapsed ? "md:w-20" : "md:w-64"
+        } ${mobileOpen ? "left-0" : "-left-64"}`}
+      >
       <div className="flex-1 overflow-y-auto">
         <div
           className={`flex items-center gap-3 pt-6 pb-6 ${
@@ -214,6 +263,16 @@ export default function SideNav() {
             </span>
           </div>
         )}
+        <button
+          type="button"
+          onClick={() => setMobileOpen(false)}
+          aria-label="Close menu"
+          className={`ml-auto flex h-8 w-8 items-center justify-center rounded-lg text-muted transition-colors hover:bg-border/50 hover:text-primary md:hidden ${
+            collapsed ? "ml-0" : "ml-auto"
+          }`}
+        >
+          <X className="h-5 w-5" />
+        </button>
       </div>
       <div
         className={`flex flex-col gap-1 pb-4 ${
@@ -232,16 +291,22 @@ export default function SideNav() {
         </button>
         <button
           type="button"
-          title="Dark Mode"
+          onClick={toggleTheme}
+          title={theme === "dark" ? "Light Mode" : "Dark Mode"}
           className={`flex items-center gap-3 py-1 font-nunito text-sm font-semibold text-muted transition-colors hover:text-primary ${
             collapsed ? "justify-center px-0" : "px-1"
           }`}
         >
-          <Moon className="h-4 w-4 shrink-0" />
-          {!collapsed && "Dark Mode"}
+          {theme === "dark" ? (
+            <Sun className="h-4 w-4 shrink-0" />
+          ) : (
+            <Moon className="h-4 w-4 shrink-0" />
+          )}
+          {!collapsed && (theme === "dark" ? "Light Mode" : "Dark Mode")}
         </button>
         <button
           type="button"
+          onClick={() => setCommitmentOptionsOpen(true)}
           title="Commitment"
           className={`mt-2 flex items-center gap-2 rounded-lg border-1 border-border bg-surface font-nunito text-sm font-bold text-primary transition-colors hover:bg-border/50 ${
             collapsed
@@ -293,6 +358,7 @@ export default function SideNav() {
             <Link
               key={item.href}
               href={item.href}
+              onClick={() => setMobileOpen(false)}
               title={item.label}
               className={className}
             >
@@ -335,6 +401,7 @@ export default function SideNav() {
       <nav className={`flex flex-col gap-2 ${collapsed ? "mt-4 px-3" : "mt-2 px-3"}`}>
         <Link
           href="/groups"
+          onClick={() => setMobileOpen(false)}
           title="Groups"
           className={`flex items-center rounded-xl py-3 font-nunito text-sm font-semibold transition-colors ${
             collapsed ? "justify-center px-0" : "justify-between px-4"
@@ -358,7 +425,10 @@ export default function SideNav() {
                 <button
                   key={sub.id}
                   type="button"
-                  onClick={() => scrollToSection(sub.id)}
+                  onClick={() => {
+                    scrollToSection(sub.id);
+                    setMobileOpen(false);
+                  }}
                   className={`cursor-pointer rounded-lg py-1.5 pl-2 text-left font-nunito text-sm font-semibold transition-colors ${
                     isSubActive
                       ? "text-secondary"
@@ -444,6 +514,22 @@ export default function SideNav() {
         open={joinGroupOpen}
         onClose={() => setJoinGroupOpen(false)}
       />
-    </aside>
+      <CommitmentOptionsModal
+        open={commitmentOptionsOpen}
+        onClose={() => setCommitmentOptionsOpen(false)}
+        onSelect={(type) => {
+          setCommitmentType(type);
+          setCommitmentOptionsOpen(false);
+          setCommitmentOpen(true);
+        }}
+      />
+      <CommitmentModal
+        open={commitmentOpen}
+        type={commitmentType}
+        evaluationTime={evaluationTime}
+        onClose={() => setCommitmentOpen(false)}
+      />
+      </aside>
+    </>
   );
 }
