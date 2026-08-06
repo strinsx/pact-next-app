@@ -12,6 +12,7 @@ export interface CommitmentRow {
   evaluation_time: string | null;
   commitment_date: string;
   submitted_at: string | null;
+  scheduled_for: string | null;
 }
 
 export interface NewCommitment {
@@ -119,17 +120,22 @@ export async function updateCommitment(
   id: string,
   title: string,
   description: string,
-  evaluationTime: string
+  evaluationTime: string,
+  scheduledFor?: string
 ) {
+  const updates: Record<string, string | null> = {
+    title,
+    description,
+    evaluation_time: evaluationTime,
+  };
+
+  if (scheduledFor) {
+    updates.scheduled_for = scheduledFor;
+    updates.commitment_date = nextEvaluationDate(scheduledFor, evaluationTime);
+  }
+
   const supabase = createClient();
-  return supabase
-    .from("commitments")
-    .update({
-      title,
-      description,
-      evaluation_time: evaluationTime,
-    })
-    .eq("id", id);
+  return supabase.from("commitments").update(updates).eq("id", id);
 }
 
 export async function deleteCommitment(id: string) {

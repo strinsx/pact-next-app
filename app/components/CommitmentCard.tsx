@@ -12,6 +12,9 @@ import StatusModalComponent, {
 import ArchiveModal, {
   ArchivedCommitment,
 } from "@/app/components/ArchiveModal";
+import ScheduledCommitmentsModal, {
+  ScheduledCommitment,
+} from "@/app/components/ScheduledCommitmentsModal";
 import { getCurrentUser } from "@/app/lib/services/auth";
 import { getProfileByUserId, updateEvaluationTime } from "@/app/lib/services/profile";
 import {
@@ -22,6 +25,7 @@ import {
   deleteCommitment,
   toHHMM,
   isPastEvaluation,
+  formatLocalDate,
 } from "@/app/lib/services/commitments";
 import { COMMITMENT_TYPES } from "@/app/lib/commitments";
 import { postCommitmentToFeed } from "@/app/lib/services/feed";
@@ -51,7 +55,11 @@ export default function CommitmentCard() {
   const [selectedType, setSelectedType] = useState<CommitmentType>("standard");
   const [items, setItems] = useState<StatusCommitment[]>([]);
   const [archivedItems, setArchivedItems] = useState<ArchivedCommitment[]>([]);
+  const [scheduledItems, setScheduledItems] = useState<ScheduledCommitment[]>(
+    []
+  );
   const [archiveOpen, setArchiveOpen] = useState(false);
+  const [scheduledOpen, setScheduledOpen] = useState(false);
   const [selected, setSelected] = useState<StatusCommitment | null>(null);
   const [evaluationTime, setEvaluationTime] = useState("23:59");
   const [loading, setLoading] = useState(true);
@@ -89,8 +97,21 @@ export default function CommitmentCard() {
 
       const active: StatusCommitment[] = [];
       const archived: ArchivedCommitment[] = [];
+      const scheduled: ScheduledCommitment[] = [];
+      const todayKey = formatLocalDate(new Date());
 
       for (const row of (rows ?? []) as CommitmentRow[]) {
+        if (row.commitment_date.slice(0, 10) > todayKey) {
+          scheduled.push({
+            id: row.id,
+            title: row.title,
+            description: row.description ?? undefined,
+            scheduledFor: row.commitment_date.slice(0, 10),
+            evaluationTime: toHHMM(row.evaluation_time),
+          });
+          continue;
+        }
+
         const base = {
           id: row.id,
           title: row.title,
@@ -117,6 +138,7 @@ export default function CommitmentCard() {
 
       setItems(active);
       setArchivedItems(archived);
+      setScheduledItems(scheduled);
       setLoading(false);
     };
 
@@ -298,7 +320,25 @@ export default function CommitmentCard() {
       <ArchiveModal
         open={archiveOpen}
         items={archivedItems}
+        scheduledCount={scheduledItems.length}
+        onViewScheduled={() => {
+          setArchiveOpen(false);
+          setScheduledOpen(true);
+        }}
         onClose={() => setArchiveOpen(false)}
+      />
+      <ScheduledCommitmentsModal
+        open={scheduledOpen}
+        items={scheduledItems}
+        onClose={() => setScheduledOpen(false)}
+        onSaved={() => {
+          setReloadKey((k) => k + 1);
+          emitDataChanged();
+        }}
+        onDeleted={() => {
+          setReloadKey((k) => k + 1);
+          emitDataChanged();
+        }}
       />
     </div>
   );

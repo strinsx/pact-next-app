@@ -1,6 +1,6 @@
 "use client";
 
-import { Archive, CheckCircle2, X } from "lucide-react";
+import { Archive, CalendarClock, CheckCircle2, X } from "lucide-react";
 import { useEffect } from "react";
 
 export interface ArchivedCommitment {
@@ -14,6 +14,8 @@ export interface ArchivedCommitment {
 interface ArchiveModalProps {
   open: boolean;
   items: ArchivedCommitment[];
+  scheduledCount: number;
+  onViewScheduled: () => void;
   onClose: () => void;
 }
 
@@ -27,7 +29,13 @@ const formatSubmittedAt = (value: string | null) => {
   });
 };
 
-export default function ArchiveModal({ open, items, onClose }: ArchiveModalProps) {
+export default function ArchiveModal({
+  open,
+  items,
+  scheduledCount,
+  onViewScheduled,
+  onClose,
+}: ArchiveModalProps) {
   useEffect(() => {
     if (!open) return;
 
@@ -64,6 +72,19 @@ export default function ArchiveModal({ open, items, onClose }: ArchiveModalProps
         <p className="mt-1 text-left font-nunito text-sm text-muted">
           Commitments past your daily evaluation deadline
         </p>
+
+        {scheduledCount > 0 && (
+          <div className="mt-3 text-right">
+            <button
+              type="button"
+              onClick={onViewScheduled}
+              className="inline-flex cursor-pointer items-center gap-1.5 font-nunito text-xs font-bold text-secondary transition-colors hover:text-purple"
+            >
+              <CalendarClock className="h-3.5 w-3.5" />
+              View scheduled commitments ({scheduledCount})
+            </button>
+          </div>
+        )}
 
         {items.length === 0 ? (
           <p className="mt-6 text-center font-nunito text-sm text-muted">
