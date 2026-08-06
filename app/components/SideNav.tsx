@@ -38,10 +38,16 @@ interface NavItem {
   label: string;
   icon: LucideIcon;
   scrollToId?: string;
+  scrollToTop?: boolean;
 }
 
 const mainNav: NavItem[] = [
-  { href: "/home", label: "Dashboard", icon: LayoutDashboard },
+  {
+    href: "/home",
+    label: "Dashboard",
+    icon: LayoutDashboard,
+    scrollToTop: true,
+  },
   {
     href: "/analysis",
     label: "Analysis",
@@ -103,6 +109,16 @@ const scrollToSection = (id: string) => {
   document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
 };
 
+let cachedDashboardActive = false;
+
+function getDashboardActive() {
+  if (typeof window === "undefined") return cachedDashboardActive;
+
+  const active = window.scrollY <= 160;
+  if (cachedDashboardActive !== active) cachedDashboardActive = active;
+  return cachedDashboardActive;
+}
+
 let cachedAnalysisActive = false;
 
 function getAnalysisActive() {
@@ -162,6 +178,20 @@ export default function SideNav() {
     getAnalysisActive,
     getAnalysisActive
   );
+  const dashboardActive = useSyncExternalStore(
+    subscribeToScroll,
+    getDashboardActive,
+    getDashboardActive
+  );
+
+  const handleDashboardClick = () => {
+    if (pathname !== "/home") {
+      router.push("/home");
+      return;
+    }
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    setMobileOpen(false);
+  };
 
   const handleAnalysisClick = () => {
     if (pathname !== "/home") {
@@ -320,11 +350,13 @@ export default function SideNav() {
       </div>
       <nav className="flex flex-col gap-2 px-3">
         {mainNav.map((item) => {
-          const isActive = item.scrollToId
-            ? analysisActive
-            : item.href === "/"
-              ? pathname === "/"
-              : pathname.startsWith(item.href) && !analysisActive;
+          const isActive = item.scrollToTop
+            ? pathname.startsWith(item.href) && dashboardActive
+            : item.scrollToId
+              ? analysisActive
+              : item.href === "/"
+                ? pathname === "/"
+                : pathname.startsWith(item.href) && !analysisActive;
 
           const className = `flex items-center rounded-xl py-3 font-nunito text-sm font-semibold transition-colors ${
             collapsed ? "justify-center px-0" : "justify-between px-4"
@@ -344,11 +376,13 @@ export default function SideNav() {
             </>
           );
 
-          return item.scrollToId ? (
+          return item.scrollToId || item.scrollToTop ? (
             <button
               key={item.href}
               type="button"
-              onClick={handleAnalysisClick}
+              onClick={
+                item.scrollToTop ? handleDashboardClick : handleAnalysisClick
+              }
               title={item.label}
               className={`cursor-pointer ${className}`}
             >
@@ -458,7 +492,7 @@ export default function SideNav() {
         type="button"
         onClick={() => setCollapsed((prev) => !prev)}
         title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-        className="flex items-center justify-center border-t border-border py-3 font-nunito text-xs font-semibold text-muted transition-colors hover:text-primary"
+        className="hidden items-center justify-center border-t border-border py-3 font-nunito text-xs font-semibold text-muted transition-colors hover:text-primary md:flex"
       >
         {collapsed ? (
           <PanelLeftOpen className="h-4 w-4" />
