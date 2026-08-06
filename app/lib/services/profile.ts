@@ -40,6 +40,14 @@ export async function updateUsername(userId: string, username: string) {
     .eq("user_id", userId);
 }
 
+export async function updateProfile(
+  userId: string,
+  updates: { full_name?: string | null; username?: string | null }
+) {
+  const supabase = createClient();
+  return supabase.from("profiles").update(updates).eq("user_id", userId);
+}
+
 export async function updateEvaluationTime(
   userId: string,
   evaluationTime: string
