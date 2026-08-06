@@ -312,7 +312,8 @@ export default function SideNav() {
         <button
           type="button"
           title="Notifications"
-          className={`flex items-center gap-3 py-1 font-nunito text-sm font-semibold text-muted transition-colors hover:text-primary ${
+          disabled
+          className={`flex items-center gap-3 py-1 font-nunito text-sm font-semibold text-muted opacity-50 cursor-not-allowed ${
             collapsed ? "justify-center px-0" : "px-1"
           }`}
         >
