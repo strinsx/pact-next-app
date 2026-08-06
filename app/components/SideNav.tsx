@@ -492,7 +492,7 @@ export default function SideNav() {
         type="button"
         onClick={() => setCollapsed((prev) => !prev)}
         title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-        className="flex items-center justify-center border-t border-border py-3 font-nunito text-xs font-semibold text-muted transition-colors hover:text-primary"
+        className="hidden items-center justify-center border-t border-border py-3 font-nunito text-xs font-semibold text-muted transition-colors hover:text-primary md:flex"
       >
         {collapsed ? (
           <PanelLeftOpen className="h-4 w-4" />
