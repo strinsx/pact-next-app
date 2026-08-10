@@ -171,17 +171,17 @@ export default function SideNav() {
   const activeSection = useSyncExternalStore(
     subscribeToScroll,
     getActiveSection,
-    getActiveSection
+    () => cachedActiveSection
   );
   const analysisActive = useSyncExternalStore(
     subscribeToScroll,
     getAnalysisActive,
-    getAnalysisActive
+    () => cachedAnalysisActive
   );
   const dashboardActive = useSyncExternalStore(
     subscribeToScroll,
     getDashboardActive,
-    getDashboardActive
+    () => cachedDashboardActive
   );
 
   const handleDashboardClick = () => {

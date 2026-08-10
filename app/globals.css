@@ -48,6 +48,13 @@ body {
   font-family: var(--font-poppins), Arial, Helvetica, sans-serif;
 }
 
+html,
+html * {
+  transition-property: color, background-color, border-color;
+  transition-duration: 0.3s;
+  transition-timing-function: ease;
+}
+
 .feed-scroll {
   overflow-y: auto;
   scrollbar-width: thin;
@@ -69,4 +76,14 @@ body {
 
 .feed-scroll::-webkit-scrollbar-thumb:hover {
   background: var(--color-purple);
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
 }
