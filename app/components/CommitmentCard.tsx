@@ -65,6 +65,7 @@ export default function CommitmentCard() {
   const [loading, setLoading] = useState(true);
   const [reloadKey, setReloadKey] = useState(0);
   const profileIdRef = useRef<string | null>(null);
+  const submittingIdsRef = useRef(new Set<string>());
 
   useEffect(() => {
     const loadCommitments = async () => {
@@ -146,24 +147,29 @@ export default function CommitmentCard() {
   }, [reloadKey]);
 
   const handleSubmit = async (id: string, status: string) => {
-    await submitCommitment(id, status);
+    if (submittingIdsRef.current.has(id)) return;
+    submittingIdsRef.current.add(id);
+    try {
+      await submitCommitment(id, status);
 
-    if (
-      (status === "submitted" || status === "missed") &&
-      selected?.id === id &&
-      profileIdRef.current
-    ) {
-      await postCommitmentToFeed({
-        profileId: profileIdRef.current,
-        commitmentId: id,
-        title: selected.title,
-        type: status === "submitted" ? "submitted" : "missed",
-      });
+      if (
+        (status === "submitted" || status === "missed") &&
+        selected?.id === id &&
+        profileIdRef.current
+      ) {
+        await postCommitmentToFeed({
+          profileId: profileIdRef.current,
+          commitmentId: id,
+          title: selected.title,
+          type: status === "submitted" ? "submitted" : "missed",
+        });
+      }
+    } finally {
+      submittingIdsRef.current.delete(id);
+      setSelected(null);
+      setReloadKey((k) => k + 1);
+      emitDataChanged();
     }
-
-    setSelected(null);
-    setReloadKey((k) => k + 1);
-    emitDataChanged();
   };
 
   const handleUpdate = async (
