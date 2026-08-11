@@ -81,6 +81,34 @@ export async function listCommitmentsByProfile(profileId: string) {
     .order("created_at", { ascending: false });
 }
 
+export const nextRoutineDate = (
+  scheduleDays: number[],
+  evaluationTime: string
+) => {
+  const sorted = [...scheduleDays].sort((a, b) => a - b);
+  const [hour, minute] = evaluationTime.split(":").map(Number);
+  const today = new Date();
+  const todayKey = formatLocalDate(today);
+
+  for (let offset = 0; offset <= 7; offset++) {
+    const candidate = new Date(today);
+    candidate.setDate(candidate.getDate() + offset);
+    const dayNum = candidate.getDay() === 0 ? 7 : candidate.getDay();
+    if (!sorted.includes(dayNum)) continue;
+
+    if (offset === 0) {
+      const deadline = new Date(`${todayKey}T00:00:00`);
+      deadline.setHours(hour || 23, minute || 59, 0, 0);
+      if (Date.now() <= deadline.getTime()) return todayKey;
+      continue;
+    }
+
+    return formatLocalDate(candidate);
+  }
+
+  return todayKey;
+};
+
 export async function createCommitment(input: NewCommitment) {
   const supabase = createClient();
   return supabase
@@ -90,12 +118,12 @@ export async function createCommitment(input: NewCommitment) {
       title: input.title,
       description: input.description,
       commitment_type: input.commitmentType,
-      commitment_date: nextEvaluationDate(
-        input.commitmentType === "scheduled" && input.scheduledFor
-          ? input.scheduledFor
-          : formatLocalDate(new Date()),
-        input.evaluationTime
-      ),
+      commitment_date:
+        input.commitmentType === "routine" && input.scheduleDays.length > 0
+          ? nextRoutineDate(input.scheduleDays, input.evaluationTime)
+          : input.commitmentType === "scheduled" && input.scheduledFor
+            ? nextEvaluationDate(input.scheduledFor, input.evaluationTime)
+            : nextEvaluationDate(formatLocalDate(new Date()), input.evaluationTime),
       schedule_days:
         input.commitmentType === "routine" && input.scheduleDays.length > 0
           ? [...input.scheduleDays].sort((a, b) => a - b)
