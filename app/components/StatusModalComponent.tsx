@@ -25,7 +25,7 @@ const STATUS_OPTIONS = [
 interface StatusModalComponentProps {
   commitment: StatusCommitment | null;
   onClose: () => void;
-  onSubmit: (id: string, status: string) => void;
+  onSubmit: (id: string, status: string) => Promise<void> | void;
   onUpdate: (
     id: string,
     title: string,
@@ -56,6 +56,7 @@ export default function StatusModalComponent({
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [confirmingCommit, setConfirmingCommit] = useState(false);
   const [confirmingMissedCommit, setConfirmingMissedCommit] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     if (!commitment) return;
@@ -72,6 +73,18 @@ export default function StatusModalComponent({
   const handleSave = () => {
     onUpdate(commitment.id, title.trim(), description.trim(), evaluationTime);
     setEditing(false);
+  };
+
+  const handleCommit = async (status: string) => {
+    if (submitting) return;
+    setSubmitting(true);
+    try {
+      await onSubmit(commitment.id, status);
+    } finally {
+      setSubmitting(false);
+      setConfirmingCommit(false);
+      setConfirmingMissedCommit(false);
+    }
   };
 
   return (
@@ -225,14 +238,15 @@ export default function StatusModalComponent({
                     ? setConfirmingMissedCommit(true)
                     : setConfirmingCommit(true)
                 }
-                className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border-1 border-teal/30 bg-teal/10 py-2 font-nunito font-bold text-teal transition-colors hover:bg-teal/20"
+                disabled={submitting}
+                className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border-1 border-teal/30 bg-teal/10 py-2 font-nunito font-bold text-teal transition-colors hover:bg-teal/20 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 <GitCommitHorizontal
                   className="h-4 w-4"
                   stroke="url(#commitIconGrad)"
                 />
                 <span className="bg-gradient-to-r from-purple to-secondary bg-clip-text text-transparent">
-                  Commit
+                  {submitting ? "Saving..." : "Commit"}
                 </span>
               </button>
               <div className="flex gap-3">
@@ -261,20 +275,16 @@ export default function StatusModalComponent({
       <CommitConfirmationModal
         open={confirmingCommit}
         title={commitment.title}
+        submitting={submitting}
         onClose={() => setConfirmingCommit(false)}
-        onConfirm={() => {
-          setConfirmingCommit(false);
-          onSubmit(commitment.id, "submitted");
-        }}
+        onConfirm={() => handleCommit("submitted")}
       />
       <ConfirmationModalForMissed
         open={confirmingMissedCommit}
         title={commitment.title}
+        submitting={submitting}
         onClose={() => setConfirmingMissedCommit(false)}
-        onConfirm={() => {
-          setConfirmingMissedCommit(false);
-          onSubmit(commitment.id, "missed");
-        }}
+        onConfirm={() => handleCommit("missed")}
       />
     </>
   );

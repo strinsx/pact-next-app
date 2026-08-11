@@ -8,6 +8,7 @@ interface ConfirmationModalForMissedProps {
   title: string;
   onClose: () => void;
   onConfirm: () => void;
+  submitting?: boolean;
 }
 
 export default function ConfirmationModalForMissed({
@@ -15,6 +16,7 @@ export default function ConfirmationModalForMissed({
   title,
   onClose,
   onConfirm,
+  submitting = false,
 }: ConfirmationModalForMissedProps) {
   useEffect(() => {
     if (!open) return;
@@ -70,14 +72,15 @@ export default function ConfirmationModalForMissed({
           <button
             type="button"
             onClick={onConfirm}
-            className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg border-1 border-teal/30 bg-teal/10 py-2 font-nunito font-bold text-teal transition-colors hover:bg-teal/20"
+            disabled={submitting}
+            className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg border-1 border-teal/30 bg-teal/10 py-2 font-nunito font-bold text-teal transition-colors hover:bg-teal/20 disabled:cursor-not-allowed disabled:opacity-60"
           >
             <GitCommitHorizontal
               className="h-4 w-4"
               stroke="url(#missedCommitGrad)"
             />
             <span className="bg-gradient-to-r from-purple to-secondary bg-clip-text text-transparent">
-              Yes, Commit
+              {submitting ? "Committing..." : "Yes, Commit"}
             </span>
           </button>
           <button
