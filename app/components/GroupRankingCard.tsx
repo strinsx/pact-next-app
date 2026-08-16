@@ -15,14 +15,14 @@ export default function GroupRankingCard() {
     <div className="w-full flex-1 rounded-2xl border-1 border-border bg-surface p-6">
       <div className="flex items-center gap-2">
         <Trophy className="h-5 w-5 text-secondary" />
-        <h2 className="text-left font-poppins text-xl font-bold text-primary">
+        <h2 className="text-left font-manrope text-xl font-bold text-primary">
           Group Ranking
         </h2>
       </div>
-      <p className="mt-1 text-left font-nunito text-xs text-muted">
+      <p className="mt-1 text-left font-dm-sans text-xs text-muted">
         Ranking for this month
       </p>
-      <p className="text-left font-nunito text-xs text-muted/50">
+      <p className="text-left font-dm-sans text-xs text-muted/50">
         Who has been the most consistent?
       </p>
       <ul className="mt-4 flex flex-col gap-3">
@@ -32,7 +32,7 @@ export default function GroupRankingCard() {
             className="flex items-center gap-3 text-left"
           >
             <span
-              className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full font-nunito text-xs font-bold ${
+              className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full font-dm-sans text-xs font-bold ${
                 member.id === 1
                   ? "bg-gradient-to-r from-sky-400 to-purple text-white"
                   : "bg-border/50 text-muted"
@@ -40,7 +40,7 @@ export default function GroupRankingCard() {
             >
               {member.id}
             </span>
-            <span className="w-20 shrink-0 font-nunito text-sm font-semibold text-primary">
+            <span className="w-20 shrink-0 font-dm-sans text-sm font-semibold text-primary">
               {member.name}
             </span>
             <div className="flex flex-1 items-center gap-3">
@@ -50,7 +50,7 @@ export default function GroupRankingCard() {
                   style={{ width: `${(member.score / max) * 100}%` }}
                 />
               </div>
-              <span className="w-8 text-right font-nunito text-sm font-bold text-primary">
+              <span className="w-8 text-right font-dm-sans text-sm font-bold text-primary">
                 {member.score}
               </span>
             </div>

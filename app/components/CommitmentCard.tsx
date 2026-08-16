@@ -211,13 +211,13 @@ export default function CommitmentCard() {
     <div className="w-full rounded-2xl border-1 border-border bg-surface p-6">
       <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-center">
         <div className="flex flex-col gap-1 text-left">
-          <h2 className="font-poppins text-xl font-bold text-primary">
+          <h2 className="font-manrope text-xl font-bold text-primary">
             Commitments for today
           </h2>
-          <p className="font-nunito text-xs text-muted">
+          <p className="font-dm-sans text-xs text-muted">
             Be specific - your group will see this
           </p>
-          <p className="font-nunito text-xs text-muted/70">
+          <p className="font-dm-sans text-xs text-muted/70">
             Commitments are evaluated automatically once the daily deadline
             passes
           </p>
@@ -230,7 +230,7 @@ export default function CommitmentCard() {
           <button
             type="button"
             onClick={() => setArchiveOpen(true)}
-            className="flex cursor-pointer items-center gap-2 rounded-lg border-1 border-border bg-background px-3 py-2 font-nunito text-sm font-bold text-muted shadow-sm transition-colors hover:border-secondary hover:text-secondary"
+            className="flex cursor-pointer items-center gap-2 rounded-lg border-1 border-border bg-background px-3 py-2 font-dm-sans text-sm font-bold text-muted shadow-sm transition-colors hover:border-secondary hover:text-secondary"
           >
             <Archive className="h-4 w-4" />
             Archive
@@ -238,7 +238,7 @@ export default function CommitmentCard() {
           <button
             type="button"
             onClick={() => setOptionsOpen(true)}
-            className="flex cursor-pointer items-center gap-2 rounded-lg border-1 border-border bg-surface px-4 py-2 font-nunito text-sm font-bold text-primary shadow-sm transition-colors hover:bg-border/50"
+            className="flex cursor-pointer items-center gap-2 rounded-lg border-1 border-border bg-surface px-4 py-2 font-dm-sans text-sm font-bold text-primary shadow-sm transition-colors hover:bg-border/50"
           >
             <Plus className="h-4 w-4" />
             Create
@@ -246,11 +246,11 @@ export default function CommitmentCard() {
         </div>
       </div>
       {loading ? (
-        <p className="mt-6 text-center font-nunito text-sm text-muted">
+        <p className="mt-6 text-center font-dm-sans text-sm text-muted">
           Loading commitments...
         </p>
       ) : items.length === 0 ? (
-        <p className="mt-6 text-center font-nunito text-sm text-muted">
+        <p className="mt-6 text-center font-dm-sans text-sm text-muted">
           No commitments yet. Create your first one.
         </p>
       ) : (
@@ -276,15 +276,15 @@ export default function CommitmentCard() {
                 }`}
               >
                 <div className="flex flex-col text-left">
-                  <span className="font-nunito text-sm font-semibold text-primary">
+                  <span className="font-dm-sans text-sm font-semibold text-primary">
                     {commitment.title}
                   </span>
-                  <span className="font-nunito text-xs text-muted">
+                  <span className="font-dm-sans text-xs text-muted">
                     {commitment.group}
                   </span>
                 </div>
                 <span
-                  className={`flex items-center gap-2 rounded-full px-3 py-1 font-nunito text-xs font-bold ${status.className}`}
+                  className={`flex items-center gap-2 rounded-full px-3 py-1 font-dm-sans text-xs font-bold ${status.className}`}
                 >
                   <StatusIcon className="h-3.5 w-3.5" />
                   {status.label}

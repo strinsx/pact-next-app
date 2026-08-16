@@ -58,7 +58,7 @@ export default function ArchiveModal({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between">
-          <h2 className="font-poppins text-xl font-bold text-primary">
+          <h2 className="font-manrope text-xl font-bold text-primary">
             Archive
           </h2>
           <button
@@ -69,7 +69,7 @@ export default function ArchiveModal({
             <X className="h-5 w-5" />
           </button>
         </div>
-        <p className="mt-1 text-left font-nunito text-sm text-muted">
+        <p className="mt-1 text-left font-dm-sans text-sm text-muted">
           Commitments past your daily evaluation deadline
         </p>
 
@@ -78,7 +78,7 @@ export default function ArchiveModal({
             <button
               type="button"
               onClick={onViewScheduled}
-              className="inline-flex cursor-pointer items-center gap-1.5 font-nunito text-xs font-bold text-secondary transition-colors hover:text-purple"
+              className="inline-flex cursor-pointer items-center gap-1.5 font-dm-sans text-xs font-bold text-secondary transition-colors hover:text-purple"
             >
               <CalendarClock className="h-3.5 w-3.5" />
               View scheduled commitments ({scheduledCount})
@@ -87,7 +87,7 @@ export default function ArchiveModal({
         )}
 
         {items.length === 0 ? (
-          <p className="mt-6 text-center font-nunito text-sm text-muted">
+          <p className="mt-6 text-center font-dm-sans text-sm text-muted">
             No archived commitments yet.
           </p>
         ) : (
@@ -98,13 +98,13 @@ export default function ArchiveModal({
                 className="flex items-center justify-between rounded-xl border-1 border-border bg-background px-4 py-3"
               >
                 <div className="flex flex-col text-left">
-                  <span className="font-nunito text-sm font-semibold text-primary">
+                  <span className="font-dm-sans text-sm font-semibold text-primary">
                     {item.title}
                   </span>
-                  <span className="font-nunito text-xs text-muted">
+                  <span className="font-dm-sans text-xs text-muted">
                     {item.group}
                   </span>
-                  <span className="mt-1 flex items-center gap-1 font-nunito text-xs text-muted">
+                  <span className="mt-1 flex items-center gap-1 font-dm-sans text-xs text-muted">
                     <Archive className="h-3 w-3" />
                     {item.status === "Completed"
                       ? formatSubmittedAt(item.submittedAt) ?? "Submitted"
@@ -112,7 +112,7 @@ export default function ArchiveModal({
                   </span>
                 </div>
                 <span
-                  className={`flex items-center gap-2 rounded-full px-3 py-1 font-nunito text-xs font-bold ${
+                  className={`flex items-center gap-2 rounded-full px-3 py-1 font-dm-sans text-xs font-bold ${
                     item.status === "Completed"
                       ? "bg-teal/10 text-teal"
                       : "bg-red-500/10 text-red-500"

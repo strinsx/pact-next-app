@@ -82,7 +82,7 @@ export default function TimePicker({ value, onChange }: TimePickerProps) {
       <button
         type="button"
         onClick={openPicker}
-        className="flex cursor-pointer items-center gap-2 rounded-lg border-1 border-border bg-background px-3 py-2 font-nunito text-xs text-muted transition-colors hover:border-secondary"
+        className="flex cursor-pointer items-center gap-2 rounded-lg border-1 border-border bg-background px-3 py-2 font-dm-sans text-xs text-muted transition-colors hover:border-secondary"
       >
         <Clock className="h-3.5 w-3.5 text-secondary" />
         <span>Evaluation deadline</span>
@@ -100,7 +100,7 @@ export default function TimePicker({ value, onChange }: TimePickerProps) {
                   key={h}
                   type="button"
                   onClick={() => setDraftHour(Number(h))}
-                  className={`block w-12 cursor-pointer px-2 py-1 text-center font-nunito text-sm transition-colors ${
+                  className={`block w-12 cursor-pointer px-2 py-1 text-center font-dm-sans text-sm transition-colors ${
                     h === String(draftHour)
                       ? "bg-secondary font-bold text-white"
                       : "text-primary hover:bg-secondary/10"
@@ -116,7 +116,7 @@ export default function TimePicker({ value, onChange }: TimePickerProps) {
                   key={m}
                   type="button"
                   onClick={() => setDraftMinute(Number(m))}
-                  className={`block w-12 cursor-pointer px-2 py-1 text-center font-nunito text-sm transition-colors ${
+                  className={`block w-12 cursor-pointer px-2 py-1 text-center font-dm-sans text-sm transition-colors ${
                     m === String(draftMinute).padStart(2, "0")
                       ? "bg-secondary font-bold text-white"
                       : "text-primary hover:bg-secondary/10"
@@ -132,7 +132,7 @@ export default function TimePicker({ value, onChange }: TimePickerProps) {
                   key={p}
                   type="button"
                   onClick={() => setDraftPeriod(p)}
-                  className={`w-12 cursor-pointer px-2 py-2 text-center font-nunito text-sm transition-colors ${
+                  className={`w-12 cursor-pointer px-2 py-2 text-center font-dm-sans text-sm transition-colors ${
                     p === draftPeriod
                       ? "bg-secondary font-bold text-white"
                       : "text-primary hover:bg-secondary/10"
@@ -146,7 +146,7 @@ export default function TimePicker({ value, onChange }: TimePickerProps) {
           <button
             type="button"
             onClick={handleUpdate}
-            className="w-full cursor-pointer rounded-lg border-1 border-border bg-surface py-1.5 font-nunito text-sm font-bold text-primary shadow-sm transition-colors hover:bg-border/50"
+            className="w-full cursor-pointer rounded-lg border-1 border-border bg-surface py-1.5 font-dm-sans text-sm font-bold text-primary shadow-sm transition-colors hover:bg-border/50"
           >
             Update
           </button>

@@ -37,7 +37,7 @@ export default function Home() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen items-center justify-center font-nunito text-sm text-muted">
+      <div className="flex min-h-screen items-center justify-center font-dm-sans text-sm text-muted">
         Loading...
       </div>
     );

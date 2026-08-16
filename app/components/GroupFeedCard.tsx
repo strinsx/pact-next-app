@@ -204,13 +204,13 @@ export default function GroupFeedCard() {
 
   return (
     <div className="w-full flex-1 rounded-2xl border-1 border-border bg-surface p-6">
-      <h2 className="text-left font-poppins text-xl font-bold text-primary">
+      <h2 className="text-left font-manrope text-xl font-bold text-primary">
         Group Feed
       </h2>
       {myGroups.length > 0 && (
         <div className="mt-3 flex flex-wrap items-center gap-2">
           {myGroups.map((group) => (
-            <span key={group.id} className="font-nunito text-xs text-muted">
+            <span key={group.id} className="font-dm-sans text-xs text-muted">
               {group.name}
             </span>
           ))}
@@ -218,18 +218,18 @@ export default function GroupFeedCard() {
       )}
       {!loading && myGroups.length === 0 ? (
         <div className="feed-scroll mt-4 flex h-96 items-center justify-center">
-          <p className="font-nunito text-sm text-muted">
+          <p className="font-dm-sans text-sm text-muted">
             Join a group to see its feed.
           </p>
         </div>
       ) : (
         <div className="feed-scroll mt-4 flex h-96 flex-col gap-4 pr-1">
           {loading && items.length === 0 ? (
-            <p className="py-20 text-center font-nunito text-sm text-muted">
+            <p className="py-20 text-center font-dm-sans text-sm text-muted">
               Loading feed...
             </p>
           ) : items.length === 0 ? (
-            <p className="py-20 text-center font-nunito text-sm text-muted">
+            <p className="py-20 text-center font-dm-sans text-sm text-muted">
               No posts yet. Create a commitment and it will show up here.
             </p>
           ) : (
@@ -239,20 +239,20 @@ export default function GroupFeedCard() {
                 className="rounded-xl border-1 border-border bg-background px-4 py-3 text-left"
               >
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-r from-sky-400 to-purple font-nunito text-sm font-bold text-white">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-r from-sky-400 to-purple font-dm-sans text-sm font-bold text-white">
                     {post.name[0].toUpperCase()}
                   </div>
                   <div className="flex flex-col">
-                    <span className="font-nunito text-sm font-semibold text-primary">
+                    <span className="font-dm-sans text-sm font-semibold text-primary">
                       {post.group}
                     </span>
-                    <span className="flex items-center gap-1 font-nunito text-xs text-muted">
+                    <span className="flex items-center gap-1 font-dm-sans text-xs text-muted">
                       <Crown className="h-3 w-3 text-secondary" />
                       {post.name} · {post.time}
                     </span>
                   </div>
                 </div>
-                <p className="mt-3 font-nunito text-sm">
+                <p className="mt-3 font-dm-sans text-sm">
                   <span className="font-bold text-primary">{post.name}</span>{" "}
                   <span
                     className={
@@ -272,7 +272,7 @@ export default function GroupFeedCard() {
                       key={emoji}
                       type="button"
                       onClick={() => toggleReaction(post.id, emoji)}
-                      className={`flex cursor-pointer items-center gap-1.5 rounded-full px-2.5 py-1 font-nunito text-xs font-bold transition-colors ${
+                      className={`flex cursor-pointer items-center gap-1.5 rounded-full px-2.5 py-1 font-dm-sans text-xs font-bold transition-colors ${
                         reaction.reacted
                           ? "bg-secondary/10 text-secondary"
                           : "bg-border/50 text-muted hover:bg-border"
@@ -285,7 +285,7 @@ export default function GroupFeedCard() {
                   <button
                     type="button"
                     onClick={() => addReaction(post.id)}
-                    className="flex cursor-pointer items-center gap-1 rounded-full px-2.5 py-1 font-nunito text-xs font-bold text-muted transition-colors hover:bg-border"
+                    className="flex cursor-pointer items-center gap-1 rounded-full px-2.5 py-1 font-dm-sans text-xs font-bold text-muted transition-colors hover:bg-border"
                   >
                     <Plus className="h-3.5 w-3.5" />
                   </button>
@@ -295,7 +295,7 @@ export default function GroupFeedCard() {
                     {post.comments.map((comment) => (
                       <li
                         key={comment.id}
-                        className="flex flex-col font-nunito text-xs"
+                        className="flex flex-col font-dm-sans text-xs"
                       >
                         <span className="font-bold text-primary">
                           {comment.name}
@@ -319,12 +319,12 @@ export default function GroupFeedCard() {
                     onKeyDown={(e) => {
                       if (e.key === "Enter") addComment(post.id);
                     }}
-                    className="w-full rounded-lg border-1 border-border bg-surface px-3 py-1.5 font-nunito text-xs text-primary placeholder:text-muted focus:outline-none"
+                    className="w-full rounded-lg border-1 border-border bg-surface px-3 py-1.5 font-dm-sans text-xs text-primary placeholder:text-muted focus:outline-none"
                   />
                   <button
                     type="button"
                     onClick={() => addComment(post.id)}
-                    className="flex cursor-pointer items-center gap-1.5 rounded-lg bg-gradient-to-r from-sky-400 to-purple px-3 py-1.5 font-nunito text-xs font-bold text-white transition-opacity hover:opacity-90"
+                    className="flex cursor-pointer items-center gap-1.5 rounded-lg bg-gradient-to-r from-sky-400 to-purple px-3 py-1.5 font-dm-sans text-xs font-bold text-white transition-opacity hover:opacity-90"
                   >
                     <Send className="h-3.5 w-3.5" />
                     Send

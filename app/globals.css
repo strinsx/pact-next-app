@@ -38,14 +38,15 @@
   --color-muted: var(--muted);
   --color-border: var(--border);
   --color-surface: var(--surface);
-  --font-sans: var(--font-poppins);
-  --font-nunito: var(--font-nunito);
+  --font-sans: var(--font-dm-sans);
+  --font-manrope: var(--font-manrope);
+  --font-dm-sans: var(--font-dm-sans);
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: var(--font-poppins), Arial, Helvetica, sans-serif;
+  font-family: var(--font-dm-sans), Arial, Helvetica, sans-serif;
 }
 
 html,

@@ -159,7 +159,7 @@ export default function CommitmentModal({ open, type, evaluationTime, existingTi
           onClick={(e) => e.stopPropagation()}
         >
           <div className="flex items-center justify-between">
-            <h2 className="font-poppins text-xl font-bold text-primary">
+            <h2 className="font-manrope text-xl font-bold text-primary">
               New Commitment
             </h2>
             <button
@@ -170,20 +170,20 @@ export default function CommitmentModal({ open, type, evaluationTime, existingTi
               <X className="h-5 w-5" />
             </button>
           </div>
-          <p className="mt-1 text-left font-nunito text-sm text-muted">
+          <p className="mt-1 text-left font-dm-sans text-sm text-muted">
             Be specific — your group will see this
           </p>
-          <span className="mt-3 inline-flex w-fit items-center gap-2 rounded-full bg-secondary/10 px-3 py-1 font-nunito text-xs font-bold text-secondary">
+          <span className="mt-3 inline-flex w-fit items-center gap-2 rounded-full bg-secondary/10 px-3 py-1 font-dm-sans text-xs font-bold text-secondary">
             {COMMITMENT_TYPES.find((t) => t.value === type)?.label ?? "Routine"}
           </span>
           {error && (
-            <p className="mt-4 rounded-lg border-1 border-red-500/30 bg-red-500/10 px-3 py-2 font-nunito text-sm text-red-500">
+            <p className="mt-4 rounded-lg border-1 border-red-500/30 bg-red-500/10 px-3 py-2 font-dm-sans text-sm text-red-500">
               {error}
             </p>
           )}
           <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4">
             <div className="flex flex-col gap-1 text-left">
-              <label className="font-poppins text-sm font-light text-secondary">
+              <label className="font-manrope text-sm font-light text-secondary">
                 Title
               </label>
               <input
@@ -192,11 +192,11 @@ export default function CommitmentModal({ open, type, evaluationTime, existingTi
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 required
-                className="w-full rounded-xl border-1 border-border bg-transparent px-4 py-2 font-nunito text-sm text-primary shadow-sm placeholder:text-muted focus:outline-none"
+                className="w-full rounded-xl border-1 border-border bg-transparent px-4 py-2 font-dm-sans text-sm text-primary shadow-sm placeholder:text-muted focus:outline-none"
               />
             </div>
             <div className="flex flex-col gap-1 text-left">
-              <label className="font-poppins text-sm font-light text-secondary">
+              <label className="font-manrope text-sm font-light text-secondary">
                 Description
               </label>
               <textarea
@@ -204,12 +204,12 @@ export default function CommitmentModal({ open, type, evaluationTime, existingTi
                 placeholder="What are you committing to?"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                className="w-full resize-none rounded-xl border-1 border-border bg-transparent px-4 py-2 font-nunito text-sm text-primary shadow-sm placeholder:text-muted focus:outline-none"
+                className="w-full resize-none rounded-xl border-1 border-border bg-transparent px-4 py-2 font-dm-sans text-sm text-primary shadow-sm placeholder:text-muted focus:outline-none"
               />
             </div>
             {type === "routine" && (
               <div className="flex flex-col gap-1 text-left">
-                <label className="font-poppins text-sm font-light text-secondary">
+                <label className="font-manrope text-sm font-light text-secondary">
                   Days
                 </label>
                 <div className="flex flex-wrap gap-2">
@@ -220,7 +220,7 @@ export default function CommitmentModal({ open, type, evaluationTime, existingTi
                         key={day.value}
                         type="button"
                         onClick={() => toggleDay(day.value)}
-                        className={`cursor-pointer rounded-full border-1 px-3 py-1 font-nunito text-xs font-bold transition-colors ${
+                        className={`cursor-pointer rounded-full border-1 px-3 py-1 font-dm-sans text-xs font-bold transition-colors ${
                           selected
                             ? "border-secondary bg-secondary text-white"
                             : "border-border bg-transparent text-muted hover:border-secondary hover:text-secondary"
@@ -232,7 +232,7 @@ export default function CommitmentModal({ open, type, evaluationTime, existingTi
                   })}
                 </div>
                 {scheduleDays.length === 0 && (
-                  <p className="font-nunito text-xs text-muted/70">
+                  <p className="font-dm-sans text-xs text-muted/70">
                     Pick the days this repeats, e.g. Tue, Thu, Sat
                   </p>
                 )}
@@ -240,7 +240,7 @@ export default function CommitmentModal({ open, type, evaluationTime, existingTi
             )}
             {type === "scheduled" && (
               <div className="flex flex-col gap-1 text-left">
-                <label className="font-poppins text-sm font-light text-secondary">
+                <label className="font-manrope text-sm font-light text-secondary">
                   Scheduled for
                 </label>
                 <DatePicker
@@ -253,7 +253,7 @@ export default function CommitmentModal({ open, type, evaluationTime, existingTi
             <button
               type="submit"
               disabled={saving}
-              className="mt-2 w-full cursor-pointer rounded-lg border-1 border-border bg-surface py-2 font-nunito font-bold text-primary shadow-sm transition-colors hover:bg-border/50 disabled:cursor-not-allowed disabled:opacity-60"
+              className="mt-2 w-full cursor-pointer rounded-lg border-1 border-border bg-surface py-2 font-dm-sans font-bold text-primary shadow-sm transition-colors hover:bg-border/50 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {saving ? "Creating..." : "Create Commitment"}
             </button>

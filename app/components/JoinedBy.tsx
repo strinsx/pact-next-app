@@ -12,13 +12,13 @@ export default function JoinedBy() {
         {people.map((person) => (
           <div
             key={person.id}
-            className={`flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-r ${person.gradient} font-nunito text-xs font-bold text-white ring-2 ring-background`}
+            className={`flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-r ${person.gradient} font-dm-sans text-xs font-bold text-white ring-2 ring-background`}
           >
             {person.initials}
           </div>
         ))}
       </div>
-      <span className="font-nunito text-sm text-muted">
+      <span className="font-dm-sans text-sm text-muted">
         Joined by people building real streaks, not vanity ones
       </span>
     </div>

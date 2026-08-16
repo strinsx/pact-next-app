@@ -19,10 +19,10 @@ export default function Branding() {
           height={90}
           priority
         />
-        <h1 className="mt-6 font-poppins text-3xl font-bold text-primary">
+        <h1 className="mt-6 font-manrope text-3xl font-bold text-primary">
           Pact - Accountability App
         </h1>
-        <p className="mt-4 font-poppins text-lg font-semibold leading-relaxed text-secondary">
+        <p className="mt-4 font-manrope text-lg font-semibold leading-relaxed text-secondary">
           Make a commitment. Keep your word. Build consistency.
         </p>
        </div>
@@ -31,13 +31,13 @@ export default function Branding() {
           {coreValues.map((value) => (
             <li
               key={value}
-              className="font-nunito text-sm font-semibold text-secondary/90"
+              className="font-dm-sans text-sm font-semibold text-secondary/90"
             >
               {value}
             </li>
           ))}
         </ul>
-        <p className="mt-10 font-nunito text-sm leading-relaxed text-muted/50">
+        <p className="mt-10 font-dm-sans text-sm leading-relaxed text-muted/50">
           Pact is an accountability platform where people build consistency by
           making commitments and following through on them together.
         </p>

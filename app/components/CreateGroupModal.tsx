@@ -133,7 +133,7 @@ export default function CreateGroupModal({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between">
-          <h2 className="font-poppins text-xl font-bold text-primary">
+          <h2 className="font-manrope text-xl font-bold text-primary">
             Create Group
           </h2>
           <button
@@ -144,17 +144,17 @@ export default function CreateGroupModal({
             <X className="h-5 w-5" />
           </button>
         </div>
-        <p className="mt-1 text-left font-nunito text-sm text-muted">
+        <p className="mt-1 text-left font-dm-sans text-sm text-muted">
           Start your own group and invite people to hold each other accountable
         </p>
         {error && (
-          <p className="mt-4 rounded-lg border-1 border-red-500/30 bg-red-500/10 px-3 py-2 font-nunito text-sm text-red-500">
+          <p className="mt-4 rounded-lg border-1 border-red-500/30 bg-red-500/10 px-3 py-2 font-dm-sans text-sm text-red-500">
             {error}
           </p>
         )}
         <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-4">
           <div className="flex flex-col gap-1 text-left">
-            <label className="font-poppins text-sm font-light text-secondary">
+            <label className="font-manrope text-sm font-light text-secondary">
               Group name
             </label>
             <input
@@ -163,11 +163,11 @@ export default function CreateGroupModal({
               value={name}
               onChange={(e) => setName(e.target.value)}
               required
-              className="w-full rounded-xl border-1 border-border bg-transparent px-4 py-2 font-nunito text-sm text-primary shadow-sm placeholder:text-muted focus:outline-none"
+              className="w-full rounded-xl border-1 border-border bg-transparent px-4 py-2 font-dm-sans text-sm text-primary shadow-sm placeholder:text-muted focus:outline-none"
             />
           </div>
           <div className="flex flex-col gap-1 text-left">
-            <label className="font-poppins text-sm font-light text-secondary">
+            <label className="font-manrope text-sm font-light text-secondary">
               Description
             </label>
             <textarea
@@ -175,11 +175,11 @@ export default function CreateGroupModal({
               placeholder="What is this group about?"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full resize-none rounded-xl border-1 border-border bg-transparent px-4 py-2 font-nunito text-sm text-primary shadow-sm placeholder:text-muted focus:outline-none"
+              className="w-full resize-none rounded-xl border-1 border-border bg-transparent px-4 py-2 font-dm-sans text-sm text-primary shadow-sm placeholder:text-muted focus:outline-none"
             />
           </div>
           <div className="flex flex-col gap-1 text-left">
-            <label className="font-poppins text-sm font-light text-secondary">
+            <label className="font-manrope text-sm font-light text-secondary">
               Max members
             </label>
             <div className="flex items-center gap-3">
@@ -193,12 +193,12 @@ export default function CreateGroupModal({
                 value={maxMembers}
                 onChange={(e) => setMaxMembers(Number(e.target.value))}
                 required
-                className="w-24 rounded-xl border-1 border-border bg-transparent px-4 py-2 font-nunito text-sm text-primary shadow-sm placeholder:text-muted focus:outline-none"
+                className="w-24 rounded-xl border-1 border-border bg-transparent px-4 py-2 font-dm-sans text-sm text-primary shadow-sm placeholder:text-muted focus:outline-none"
               />
             </div>
           </div>
           <div className="flex flex-col gap-1 text-left">
-            <label className="font-poppins text-sm font-light text-secondary">
+            <label className="font-manrope text-sm font-light text-secondary">
               Evaluation deadline
             </label>
             <TimePicker value={evaluationTime} onChange={setEvaluationTime} />
@@ -206,7 +206,7 @@ export default function CreateGroupModal({
           <button
             type="submit"
             disabled={saving}
-            className="mt-2 w-full cursor-pointer rounded-lg border-1 border-border bg-surface py-2 font-nunito font-bold text-primary shadow-sm transition-colors hover:bg-border/50 disabled:cursor-not-allowed disabled:opacity-60"
+            className="mt-2 w-full cursor-pointer rounded-lg border-1 border-border bg-surface py-2 font-dm-sans font-bold text-primary shadow-sm transition-colors hover:bg-border/50 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {saving ? "Creating..." : "Create Group"}
           </button>
@@ -225,10 +225,10 @@ export default function CreateGroupModal({
           <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-secondary/10">
             <Users className="h-6 w-6 text-secondary" />
           </div>
-          <h2 className="mt-4 font-poppins text-xl font-bold text-primary">
+          <h2 className="mt-4 font-manrope text-xl font-bold text-primary">
             Create group?
           </h2>
-          <p className="mt-1 font-nunito text-sm text-muted">
+          <p className="mt-1 font-dm-sans text-sm text-muted">
             You will become the owner of {name.trim()} and can invite up to 7
             members.
           </p>
@@ -236,7 +236,7 @@ export default function CreateGroupModal({
             <button
               type="button"
               onClick={() => setConfirmOpen(false)}
-              className="flex-1 cursor-pointer rounded-lg border-1 border-border bg-surface py-2 font-nunito font-bold text-muted transition-colors hover:bg-border/50 hover:text-primary"
+              className="flex-1 cursor-pointer rounded-lg border-1 border-border bg-surface py-2 font-dm-sans font-bold text-muted transition-colors hover:bg-border/50 hover:text-primary"
             >
               Cancel
             </button>
@@ -244,7 +244,7 @@ export default function CreateGroupModal({
               type="button"
               onClick={handleConfirm}
               disabled={saving}
-              className="flex-1 cursor-pointer rounded-lg border-1 border-border bg-surface py-2 font-nunito font-bold text-primary shadow-sm transition-colors hover:bg-border/50 disabled:cursor-not-allowed disabled:opacity-60"
+              className="flex-1 cursor-pointer rounded-lg border-1 border-border bg-surface py-2 font-dm-sans font-bold text-primary shadow-sm transition-colors hover:bg-border/50 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {saving ? "Creating..." : "Confirm"}
             </button>

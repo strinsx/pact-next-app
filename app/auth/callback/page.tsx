@@ -56,7 +56,7 @@ export default function AuthCallback() {
   if (error) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center gap-4 px-4">
-        <p className="rounded-lg border-1 border-red-500/30 bg-red-500/10 px-3 py-2 font-nunito text-sm text-red-500">
+        <p className="rounded-lg border-1 border-red-500/30 bg-red-500/10 px-3 py-2 font-dm-sans text-sm text-red-500">
           {error}
         </p>
         <Link href="/auth/login" className="font-bold text-primary">
@@ -67,7 +67,7 @@ export default function AuthCallback() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center font-nunito text-sm text-muted">
+    <div className="flex min-h-screen items-center justify-center font-dm-sans text-sm text-muted">
       Signing you in...
     </div>
   );

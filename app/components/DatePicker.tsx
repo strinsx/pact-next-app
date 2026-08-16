@@ -91,7 +91,7 @@ export default function DatePicker({
       <button
         type="button"
         onClick={() => setOpen((prev) => !prev)}
-        className="flex w-full cursor-pointer items-center gap-3 rounded-xl border-1 border-border bg-transparent px-4 py-2 font-nunito text-sm text-primary shadow-sm transition-colors hover:border-secondary focus:outline-none"
+        className="flex w-full cursor-pointer items-center gap-3 rounded-xl border-1 border-border bg-transparent px-4 py-2 font-dm-sans text-sm text-primary shadow-sm transition-colors hover:border-secondary focus:outline-none"
       >
         <CalendarDays className="h-4 w-4 shrink-0 text-secondary" />
         <span className={selectedDate ? "text-primary" : "text-muted"}>
@@ -109,7 +109,7 @@ export default function DatePicker({
             >
               <ChevronLeft className="h-4 w-4" />
             </button>
-            <span className="font-poppins text-sm font-bold text-primary">
+            <span className="font-manrope text-sm font-bold text-primary">
               {MONTHS[month]} {year}
             </span>
             <button
@@ -125,7 +125,7 @@ export default function DatePicker({
             {WEEKDAYS.map((day) => (
               <span
                 key={day}
-                className="py-1 text-center font-nunito text-[10px] font-bold uppercase text-muted"
+                className="py-1 text-center font-dm-sans text-[10px] font-bold uppercase text-muted"
               >
                 {day}
               </span>
@@ -153,7 +153,7 @@ export default function DatePicker({
                     );
                     setOpen(false);
                   }}
-                  className={`cursor-pointer rounded-lg py-1.5 text-center font-nunito text-sm transition-colors ${
+                  className={`cursor-pointer rounded-lg py-1.5 text-center font-dm-sans text-sm transition-colors ${
                     isPast
                       ? "cursor-not-allowed text-border"
                       : isSelected
