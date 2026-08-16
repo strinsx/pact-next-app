@@ -6,6 +6,7 @@ import { Eye, EyeOff, Mail, Lock, User } from "lucide-react";
 import { useState } from "react";
 import { signUpWithEmail, signInWithGoogle } from "@/app/lib/services/auth";
 import { createProfile } from "@/app/lib/services/profile";
+import AuthIllustrationPanel from "@/app/components/AuthIllustrationPanel";
 
 export default function SignUp() {
   const [showPassword, setShowPassword] = useState(false);
@@ -60,9 +61,9 @@ export default function SignUp() {
 
   return (
     <div className="flex min-h-screen w-full items-center justify-center p-4">
-      <div className="relative mx-auto flex min-h-[70vh] w-full max-w-6xl flex-row overflow-hidden rounded-2xl shadow-lg shadow-purple-900/10">
-        <div className="flex w-[50%] items-center justify-center px-4 py-10">
-          <div className="relative w-full max-w-[480px] p-8">
+      <div className="relative mx-auto flex min-h-[70vh] w-full max-w-6xl flex-col overflow-hidden rounded-2xl shadow-lg shadow-purple-900/10 lg:flex-row">
+        <div className="flex w-full items-center justify-center px-4 py-10 lg:w-[50%]">
+          <div className="relative w-full max-w-[480px] p-2 sm:p-8">
             {error && (
               <p className="mb-5 rounded-lg border-1 border-red-500/30 bg-red-500/10 px-3 py-2 font-dm-sans text-sm text-red-500">
                 {error}
@@ -236,38 +237,7 @@ export default function SignUp() {
             </form>
           </div>
         </div>
-        <div className="relative flex w-[50%] items-center justify-center overflow-hidden bg-gradient-to-b from-blue-700 to-sky-400 p-20">
-          <div
-            aria-hidden="true"
-            className="pointer-events-none absolute -bottom-24 -right-24 h-96 w-96 rounded-full bg-[radial-gradient(circle_at_center,rgba(56,189,248,0.3),rgba(86,217,200,0.18)_45%,transparent_70%)] blur-2xl"
-          />
-
-          <div className="flex h-full w-full flex-col justify-between">
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute bottom-10 left-1/2 z-20 -translate-x-1/2 whitespace-nowrap select-none text-center font-manrope text-8xl font-extrabold uppercase tracking-tight text-white drop-shadow-lg"
-            ></div>
-
-            <div>
-              <h1 className="max-w-md font-manrope text-4xl font-extrabold leading-tight tracking-tight text-white drop-shadow-md md:text-5xl">
-                Progress feels good with a little company.
-              </h1>
-              <p className="mt-4 max-w-md font-dm-sans text-base leading-relaxed text-white/70">
-                Stay on track with friends who keep you honest and celebrate
-                every win along the way.
-              </p>
-            </div>
-
-            <Image
-              src="/paxi-happy.svg"
-              alt="Paxi mascot"
-              width={420}
-              height={420}
-              priority
-              className="relative z-10 bottom-4 h-auto max-w-full object-contain"
-            />
-          </div>
-        </div>
+        <AuthIllustrationPanel mascot="/paxi-happy.svg" />
       </div>
     </div>
   );

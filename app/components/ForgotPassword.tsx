@@ -32,9 +32,9 @@ export default function ForgotPassword() {
 
   return (
     <div className="flex min-h-screen w-full items-center justify-center p-4">
-      <div className="relative mx-auto flex min-h-[70vh] w-full max-w-6xl flex-row overflow-hidden rounded-2xl shadow-lg shadow-purple-900/10">
-        <div className="flex w-[50%] items-center justify-center px-4 py-10">
-          <div className="relative w-full max-w-[480px] p-8">
+      <div className="relative mx-auto flex min-h-[70vh] w-full max-w-6xl flex-col overflow-hidden rounded-2xl shadow-lg shadow-purple-900/10 lg:flex-row">
+        <div className="flex w-full items-center justify-center px-4 py-10 lg:w-[50%]">
+          <div className="relative w-full max-w-[480px] p-2 sm:p-8">
             {error && !sent && (
               <p className="mb-5 rounded-lg border-1 border-red-500/30 bg-red-500/10 px-3 py-2 font-dm-sans text-sm text-red-500">
                 {error}

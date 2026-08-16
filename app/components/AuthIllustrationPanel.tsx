@@ -1,8 +1,14 @@
 import Image from "next/image";
 
-export default function AuthIllustrationPanel() {
+interface AuthIllustrationPanelProps {
+  mascot?: string;
+}
+
+export default function AuthIllustrationPanel({
+  mascot = "/paxi.svg",
+}: AuthIllustrationPanelProps) {
   return (
-    <div className="relative flex w-[50%] items-center justify-center overflow-hidden bg-gradient-to-b from-blue-700 to-sky-400 p-20">
+    <div className="relative hidden w-full items-center justify-center overflow-hidden bg-gradient-to-b from-blue-700 to-sky-400 p-10 lg:flex lg:w-[50%] lg:p-20">
       <div
         aria-hidden="true"
         className="pointer-events-none absolute -bottom-24 -right-24 h-96 w-96 rounded-full bg-[radial-gradient(circle_at_center,rgba(56,189,248,0.3),rgba(86,217,200,0.18)_45%,transparent_70%)] blur-2xl"
@@ -20,7 +26,7 @@ export default function AuthIllustrationPanel() {
         </div>
 
         <Image
-          src="/paxi.svg"
+          src={mascot}
           alt="Paxi mascot"
           width={420}
           height={420}
