@@ -43,7 +43,7 @@ export default function CommitmentOptionsModal({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between">
-          <h2 className="font-poppins text-xl font-bold text-primary">
+          <h2 className="font-manrope text-xl font-bold text-primary">
             Choose Commitment Type
           </h2>
           <button
@@ -54,7 +54,7 @@ export default function CommitmentOptionsModal({
             <X className="h-5 w-5" />
           </button>
         </div>
-        <p className="mt-1 text-left font-nunito text-sm text-muted">
+        <p className="mt-1 text-left font-dm-sans text-sm text-muted">
           How do you want to commit?
         </p>
         <div className="mt-6 flex flex-col gap-3">
@@ -71,10 +71,10 @@ export default function CommitmentOptionsModal({
                   <Icon className="h-5 w-5 text-secondary" />
                 </span>
                 <span className="flex flex-1 flex-col">
-                  <span className="font-nunito text-sm font-bold text-primary">
+                  <span className="font-dm-sans text-sm font-bold text-primary">
                     {option.label}
                   </span>
-                  <span className="font-nunito text-xs text-muted">
+                  <span className="font-dm-sans text-xs text-muted">
                     {option.description}
                   </span>
                 </span>

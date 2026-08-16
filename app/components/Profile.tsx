@@ -177,7 +177,7 @@ export default function Profile() {
       style={{ backgroundImage: `url(${profile.avatarUrl})` }}
     />
   ) : (
-    <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-gradient-to-r from-sky-400 to-purple font-poppins text-3xl font-bold text-white">
+    <div className="flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-gradient-to-r from-sky-400 to-purple font-manrope text-3xl font-bold text-white">
       {initials(profile?.fullName ?? "P")}
     </div>
   );
@@ -188,20 +188,20 @@ export default function Profile() {
         <div className="flex flex-col items-center gap-6 md:flex-row md:items-center">
           {avatar}
           <div className="flex flex-1 flex-col items-center text-center md:items-start md:text-left">
-            <h1 className="bg-gradient-to-r from-sky-400 to-purple bg-clip-text font-poppins text-2xl font-bold text-transparent">
+            <h1 className="bg-gradient-to-r from-sky-400 to-purple bg-clip-text font-manrope text-2xl font-bold text-transparent">
               {profile?.fullName ?? "Your Pact"}
             </h1>
-            <span className="font-nunito text-sm font-semibold text-muted">
+            <span className="font-dm-sans text-sm font-semibold text-muted">
               {profile?.username ? `@${profile.username}` : "Set a username"}
             </span>
             {profile?.email && (
-              <span className="mt-2 flex items-center gap-2 font-nunito text-sm text-muted">
+              <span className="mt-2 flex items-center gap-2 font-dm-sans text-sm text-muted">
                 <Mail className="h-4 w-4 shrink-0 text-secondary" />
                 {profile.email}
               </span>
             )}
             {profile?.joinedAt && (
-              <span className="mt-1 flex items-center gap-2 font-nunito text-xs text-muted/70">
+              <span className="mt-1 flex items-center gap-2 font-dm-sans text-xs text-muted/70">
                 <CalendarDays className="h-4 w-4 shrink-0 text-secondary" />
                 Member since {formatJoined(profile.joinedAt)}
               </span>
@@ -210,7 +210,7 @@ export default function Profile() {
           <button
             type="button"
             onClick={openEdit}
-            className="flex shrink-0 cursor-pointer items-center gap-2 rounded-lg border-1 border-border bg-surface px-4 py-2 font-nunito text-sm font-bold text-primary shadow-sm transition-colors hover:bg-border/50"
+            className="flex shrink-0 cursor-pointer items-center gap-2 rounded-lg border-1 border-border bg-surface px-4 py-2 font-dm-sans text-sm font-bold text-primary shadow-sm transition-colors hover:bg-border/50"
           >
             <Pencil className="h-4 w-4" />
             Edit Profile
@@ -224,15 +224,15 @@ export default function Profile() {
 
       <div className="mt-2 grid w-full gap-2 lg:grid-cols-2">
         <div className="w-full rounded-2xl border-1 border-border bg-surface p-6">
-          <h2 className="font-poppins text-xl font-bold text-primary">
+          <h2 className="font-manrope text-xl font-bold text-primary">
             My Groups
           </h2>
           {loading ? (
-            <p className="mt-4 text-center font-nunito text-sm text-muted">
+            <p className="mt-4 text-center font-dm-sans text-sm text-muted">
               Loading groups...
             </p>
           ) : groups.length === 0 ? (
-            <p className="mt-4 text-center font-nunito text-sm text-muted">
+            <p className="mt-4 text-center font-dm-sans text-sm text-muted">
               You are not part of any group yet. Create or join one from the
               sidebar.
             </p>
@@ -246,7 +246,7 @@ export default function Profile() {
                   <div className="flex h-9 w-9 items-center justify-center rounded-full bg-secondary/10">
                     <Users className="h-4 w-4 text-secondary" />
                   </div>
-                  <span className="font-nunito text-sm font-semibold text-primary">
+                  <span className="font-dm-sans text-sm font-semibold text-primary">
                     {group.name}
                   </span>
                 </li>
@@ -256,15 +256,15 @@ export default function Profile() {
         </div>
 
         <div className="w-full rounded-2xl border-1 border-border bg-surface p-6">
-          <h2 className="font-poppins text-xl font-bold text-primary">
+          <h2 className="font-manrope text-xl font-bold text-primary">
             Recent Commitments
           </h2>
           {loading ? (
-            <p className="mt-4 text-center font-nunito text-sm text-muted">
+            <p className="mt-4 text-center font-dm-sans text-sm text-muted">
               Loading commitments...
             </p>
           ) : commitments.length === 0 ? (
-            <p className="mt-4 text-center font-nunito text-sm text-muted">
+            <p className="mt-4 text-center font-dm-sans text-sm text-muted">
               No commitments yet. Create your first one.
             </p>
           ) : (
@@ -280,15 +280,15 @@ export default function Profile() {
                     className="flex items-center justify-between rounded-xl border-1 border-border bg-background px-4 py-3"
                   >
                     <div className="flex flex-col text-left">
-                      <span className="font-nunito text-sm font-semibold text-primary">
+                      <span className="font-dm-sans text-sm font-semibold text-primary">
                         {commitment.title}
                       </span>
-                      <span className="font-nunito text-xs text-muted">
+                      <span className="font-dm-sans text-xs text-muted">
                         {commitment.typeLabel}
                       </span>
                     </div>
                     <span
-                      className={`flex items-center gap-2 rounded-full px-3 py-1 font-nunito text-xs font-bold ${status.className}`}
+                      className={`flex items-center gap-2 rounded-full px-3 py-1 font-dm-sans text-xs font-bold ${status.className}`}
                     >
                       <StatusIcon className="h-3.5 w-3.5" />
                       {status.label}
@@ -311,7 +311,7 @@ export default function Profile() {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between">
-              <h2 className="font-poppins text-xl font-bold text-primary">
+              <h2 className="font-manrope text-xl font-bold text-primary">
                 Edit Profile
               </h2>
               <button
@@ -323,13 +323,13 @@ export default function Profile() {
               </button>
             </div>
             {saveError && (
-              <p className="mt-4 rounded-lg border-1 border-red-500/30 bg-red-500/10 px-3 py-2 font-nunito text-sm text-red-500">
+              <p className="mt-4 rounded-lg border-1 border-red-500/30 bg-red-500/10 px-3 py-2 font-dm-sans text-sm text-red-500">
                 {saveError}
               </p>
             )}
             <div className="mt-6 flex flex-col gap-4">
               <div className="flex flex-col gap-1 text-left">
-                <label className="font-poppins text-sm font-light text-secondary">
+                <label className="font-manrope text-sm font-light text-secondary">
                   Full name
                 </label>
                 <input
@@ -337,11 +337,11 @@ export default function Profile() {
                   placeholder="Your name"
                   value={draftName}
                   onChange={(e) => setDraftName(e.target.value)}
-                  className="w-full rounded-xl border-1 border-border bg-transparent px-4 py-2 font-nunito text-sm text-primary shadow-sm placeholder:text-muted focus:outline-none"
+                  className="w-full rounded-xl border-1 border-border bg-transparent px-4 py-2 font-dm-sans text-sm text-primary shadow-sm placeholder:text-muted focus:outline-none"
                 />
               </div>
               <div className="flex flex-col gap-1 text-left">
-                <label className="font-poppins text-sm font-light text-secondary">
+                <label className="font-manrope text-sm font-light text-secondary">
                   Username
                 </label>
                 <input
@@ -349,14 +349,14 @@ export default function Profile() {
                   placeholder="e.g. alex"
                   value={draftUsername}
                   onChange={(e) => setDraftUsername(e.target.value)}
-                  className="w-full rounded-xl border-1 border-border bg-transparent px-4 py-2 font-nunito text-sm text-primary shadow-sm placeholder:text-muted focus:outline-none"
+                  className="w-full rounded-xl border-1 border-border bg-transparent px-4 py-2 font-dm-sans text-sm text-primary shadow-sm placeholder:text-muted focus:outline-none"
                 />
               </div>
               <button
                 type="button"
                 onClick={handleSave}
                 disabled={saving}
-                className="mt-2 w-full cursor-pointer rounded-lg border-1 border-border bg-surface py-2 font-nunito font-bold text-primary shadow-sm transition-colors hover:bg-border/50 disabled:cursor-not-allowed disabled:opacity-60"
+                className="mt-2 w-full cursor-pointer rounded-lg border-1 border-border bg-surface py-2 font-dm-sans font-bold text-primary shadow-sm transition-colors hover:bg-border/50 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {saving ? "Saving..." : "Save Changes"}
               </button>

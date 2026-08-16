@@ -150,15 +150,15 @@ export default function YearlyHeatmapCard() {
   return (
     <div className="w-full flex-1 rounded-2xl border-1 border-border bg-surface p-6">
       <div className="flex items-center justify-between">
-        <h2 className="font-poppins text-xl font-bold text-primary">
+        <h2 className="font-manrope text-xl font-bold text-primary">
           Yearly Contributions
         </h2>
-        <span className="flex items-center gap-2 rounded-full bg-purple/10 px-3 py-1 font-nunito text-xs font-bold text-purple">
+        <span className="flex items-center gap-2 rounded-full bg-purple/10 px-3 py-1 font-dm-sans text-xs font-bold text-purple">
           <Flame className="h-3.5 w-3.5" />
           {loading ? "..." : `${avg}% avg`}
         </span>
       </div>
-      <p className="mt-1 text-left font-nunito text-xs text-muted/70">
+      <p className="mt-1 text-left font-dm-sans text-xs text-muted/70">
         Daily completion rate over the last {visibleWeeks.length || WEEKS_TOTAL}{" "}
         weeks
       </p>
@@ -168,7 +168,7 @@ export default function YearlyHeatmapCard() {
           {monthLabels.map((month, i) => (
             <div
               key={i}
-              className="w-3.5 shrink-0 text-left font-nunito text-[10px] leading-3 text-muted"
+              className="w-3.5 shrink-0 text-left font-dm-sans text-[10px] leading-3 text-muted"
             >
               {month}
             </div>
@@ -177,7 +177,7 @@ export default function YearlyHeatmapCard() {
         <div className="mt-1 flex flex-col gap-1">
           {DAY_LABELS.map((dayLabel, row) => (
             <div key={dayLabel} className="flex items-center gap-1">
-              <div className="w-10 shrink-0 text-right font-nunito text-[10px] leading-3 text-muted">
+              <div className="w-10 shrink-0 text-right font-dm-sans text-[10px] leading-3 text-muted">
                 {ROW_LABELS[row] ?? ""}
               </div>
               {visibleWeeks.map((week) => {
@@ -212,7 +212,7 @@ export default function YearlyHeatmapCard() {
         </div>
       </div>
       <div className="mt-4 flex items-center justify-end gap-1.5">
-        <span className="font-nunito text-xs text-muted">Less</span>
+        <span className="font-dm-sans text-xs text-muted">Less</span>
         {[0, 25, 50, 75, 100].map((step) => (
           <div
             key={step}
@@ -222,7 +222,7 @@ export default function YearlyHeatmapCard() {
             }}
           />
         ))}
-        <span className="font-nunito text-xs text-muted">More</span>
+        <span className="font-dm-sans text-xs text-muted">More</span>
       </div>
       {tooltip && (
         <div
@@ -232,10 +232,10 @@ export default function YearlyHeatmapCard() {
             top: Math.max(tooltip.y - 56, 8),
           }}
         >
-          <span className="block whitespace-nowrap font-nunito text-xs font-bold text-primary">
+          <span className="block whitespace-nowrap font-dm-sans text-xs font-bold text-primary">
             {formatTooltipDate(tooltip.day.date)}
           </span>
-          <span className="block whitespace-nowrap font-nunito text-xs text-muted">
+          <span className="block whitespace-nowrap font-dm-sans text-xs text-muted">
             {tooltip.day.submitted + tooltip.day.missed > 0
               ? `${tooltip.day.value}% completed`
               : "No commitments"}

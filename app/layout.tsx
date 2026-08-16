@@ -1,16 +1,16 @@
 import type { Metadata } from "next";
-import { Nunito, Poppins } from "next/font/google";
+import { DM_Sans, Manrope } from "next/font/google";
 import "./globals.css";
 
-const poppins = Poppins({
-  weight: ["600", "700", "800"],
-  variable: "--font-poppins",
+const manrope = Manrope({
+  weight: "variable",
+  variable: "--font-manrope",
   subsets: ["latin"],
 });
 
-const nunito = Nunito({
-  weight: ["400", "600"],
-  variable: "--font-nunito",
+const dmSans = DM_Sans({
+  weight: "variable",
+  variable: "--font-dm-sans",
   subsets: ["latin"],
 });
 
@@ -45,7 +45,7 @@ export default function RootLayout({
     <html
       lang="en"
       suppressHydrationWarning
-      className={`${poppins.variable} ${nunito.variable} h-full antialiased`}
+      className={`${manrope.variable} ${dmSans.variable} h-full antialiased`}
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />

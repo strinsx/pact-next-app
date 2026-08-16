@@ -105,7 +105,7 @@ export default function GroupsOverviewCard() {
 
   if (loading) {
     return (
-      <div className="w-full rounded-2xl border-1 border-border bg-surface p-6 text-left font-nunito text-sm text-muted">
+      <div className="w-full rounded-2xl border-1 border-border bg-surface p-6 text-left font-dm-sans text-sm text-muted">
         Loading group...
       </div>
     );
@@ -114,10 +114,10 @@ export default function GroupsOverviewCard() {
   if (!group) {
     return (
       <div className="w-full rounded-2xl border-1 border-border bg-surface p-6 text-left">
-        <h2 className="font-poppins text-xl font-bold text-primary">
+        <h2 className="font-manrope text-xl font-bold text-primary">
           Your Group
         </h2>
-        <p className="mt-2 font-nunito text-sm text-muted">
+        <p className="mt-2 font-dm-sans text-sm text-muted">
           You are not part of a group yet. Use the sidebar to create or join one.
         </p>
       </div>
@@ -133,10 +133,10 @@ export default function GroupsOverviewCard() {
     <div className="w-full rounded-2xl border-1 border-border bg-surface p-6">
       <div className="flex flex-col items-start justify-between gap-4 md:flex-row md:items-start">
         <div className="flex flex-col gap-1 text-left">
-          <h2 className="bg-gradient-to-r from-sky-400 to-purple bg-clip-text font-poppins text-2xl font-bold text-transparent">
+          <h2 className="bg-gradient-to-r from-sky-400 to-purple bg-clip-text font-manrope text-2xl font-bold text-transparent">
             {group.name}
           </h2>
-          <p className="font-nunito text-sm text-muted">
+          <p className="font-dm-sans text-sm text-muted">
             {group.description}
           </p>
         </div>
@@ -147,7 +147,7 @@ export default function GroupsOverviewCard() {
                 type="button"
                 onClick={handleGenerate}
                 disabled={generating}
-                className="flex cursor-pointer items-center gap-2 rounded-lg border-1 border-border bg-surface px-4 py-2 font-nunito text-sm font-bold text-primary shadow-sm transition-colors hover:bg-border/50 disabled:cursor-not-allowed disabled:opacity-60"
+                className="flex cursor-pointer items-center gap-2 rounded-lg border-1 border-border bg-surface px-4 py-2 font-dm-sans text-sm font-bold text-primary shadow-sm transition-colors hover:bg-border/50 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 <LinkIcon className="h-4 w-4" />
                 {generating
@@ -164,7 +164,7 @@ export default function GroupsOverviewCard() {
                     .getElementById("join-access")
                     ?.scrollIntoView({ behavior: "smooth" });
                 }}
-                className="flex cursor-pointer items-center gap-2 rounded-lg border-1 border-border bg-surface px-4 py-2 font-nunito text-sm font-bold text-muted transition-colors hover:bg-border/50 hover:text-primary"
+                className="flex cursor-pointer items-center gap-2 rounded-lg border-1 border-border bg-surface px-4 py-2 font-dm-sans text-sm font-bold text-muted transition-colors hover:bg-border/50 hover:text-primary"
               >
                 <UserRoundCheck className="h-4 w-4" />
                 Review requests
@@ -175,7 +175,7 @@ export default function GroupsOverviewCard() {
               type="button"
               onClick={() => setConfirmLeave(true)}
               disabled={leaving}
-              className="flex cursor-pointer items-center gap-2 rounded-lg border-1 border-border bg-surface px-4 py-2 font-nunito text-sm font-bold text-red-500 transition-colors hover:bg-red-500/10 disabled:cursor-not-allowed disabled:opacity-60"
+              className="flex cursor-pointer items-center gap-2 rounded-lg border-1 border-border bg-surface px-4 py-2 font-dm-sans text-sm font-bold text-red-500 transition-colors hover:bg-red-500/10 disabled:cursor-not-allowed disabled:opacity-60"
             >
               <LogOut className="h-4 w-4" />
               {leaving ? "Leaving..." : "Leave Group"}
@@ -187,31 +187,31 @@ export default function GroupsOverviewCard() {
         <div className="rounded-xl border-1 border-border bg-background p-4 text-left">
           <div className="flex items-center gap-2">
             <Clock3 className="h-4 w-4 text-purple" />
-            <span className="font-nunito text-sm font-bold text-primary">
+            <span className="font-dm-sans text-sm font-bold text-primary">
               Pending
             </span>
           </div>
-          <p className="mt-2 bg-gradient-to-r from-purple to-secondary bg-clip-text font-poppins text-3xl font-bold text-transparent">
+          <p className="mt-2 bg-gradient-to-r from-purple to-secondary bg-clip-text font-manrope text-3xl font-bold text-transparent">
             0
           </p>
-          <p className="font-nunito text-xs text-muted">join requests</p>
+          <p className="font-dm-sans text-xs text-muted">join requests</p>
         </div>
         <div className="rounded-xl border-1 border-border bg-background p-4 text-left">
           <div className="flex items-center gap-2">
             <Users className="h-4 w-4 text-teal" />
-            <span className="font-nunito text-sm font-bold text-primary">
+            <span className="font-dm-sans text-sm font-bold text-primary">
               Members
             </span>
           </div>
-          <p className="mt-2 bg-gradient-to-r from-sky-400 to-teal bg-clip-text font-poppins text-3xl font-bold text-transparent">
+          <p className="mt-2 bg-gradient-to-r from-sky-400 to-teal bg-clip-text font-manrope text-3xl font-bold text-transparent">
             {group.memberCount}
           </p>
-          <p className="font-nunito text-xs text-muted">group members</p>
+          <p className="font-dm-sans text-xs text-muted">group members</p>
         </div>
         <div className="rounded-xl border-1 border-border bg-background p-4 text-left">
           <div className="flex items-center gap-2">
             <ShieldCheck className="h-4 w-4 text-secondary" />
-            <span className="font-nunito text-sm font-bold text-primary">
+            <span className="font-dm-sans text-sm font-bold text-primary">
               Roles
             </span>
           </div>
@@ -220,14 +220,14 @@ export default function GroupsOverviewCard() {
               roles.map((r) => (
                 <div
                   key={r.role}
-                  className="flex items-center justify-between font-nunito text-sm"
+                  className="flex items-center justify-between font-dm-sans text-sm"
                 >
                   <span className="text-muted">{r.label}</span>
                   <span className="font-bold text-primary">{r.count}</span>
                 </div>
               ))
             ) : (
-              <span className="font-nunito text-sm text-muted">
+              <span className="font-dm-sans text-sm text-muted">
                 No members yet
               </span>
             )}
@@ -246,17 +246,17 @@ export default function GroupsOverviewCard() {
             <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-red-500/10">
               <LogOut className="h-6 w-6 text-red-500" />
             </div>
-            <h2 className="mt-4 font-poppins text-xl font-bold text-primary">
+            <h2 className="mt-4 font-manrope text-xl font-bold text-primary">
               Leave this group?
             </h2>
-            <p className="mt-1 font-nunito text-sm text-muted">
+            <p className="mt-1 font-dm-sans text-sm text-muted">
               You will lose access to this group and its commitments.
             </p>
             <div className="mt-6 flex gap-3">
               <button
                 type="button"
                 onClick={() => setConfirmLeave(false)}
-                className="flex-1 cursor-pointer rounded-lg border-1 border-border bg-surface py-2 font-nunito font-bold text-muted transition-colors hover:bg-border/50 hover:text-primary"
+                className="flex-1 cursor-pointer rounded-lg border-1 border-border bg-surface py-2 font-dm-sans font-bold text-muted transition-colors hover:bg-border/50 hover:text-primary"
               >
                 Cancel
               </button>
@@ -264,7 +264,7 @@ export default function GroupsOverviewCard() {
                 type="button"
                 onClick={handleLeave}
                 disabled={leaving}
-                className="flex-1 cursor-pointer rounded-lg bg-red-500 py-2 font-nunito font-bold text-white transition-colors hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-60"
+                className="flex-1 cursor-pointer rounded-lg bg-red-500 py-2 font-dm-sans font-bold text-white transition-colors hover:bg-red-600 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {leaving ? "Leaving..." : "Leave group"}
               </button>

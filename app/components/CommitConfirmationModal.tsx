@@ -48,7 +48,7 @@ export default function CommitConfirmationModal({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between">
-          <h2 className="font-poppins text-xl font-bold text-primary">
+          <h2 className="font-manrope text-xl font-bold text-primary">
             Commit commitment?
           </h2>
           <button
@@ -60,10 +60,10 @@ export default function CommitConfirmationModal({
           </button>
         </div>
         <div className="mt-4 flex flex-col gap-2 text-left">
-          <h3 className="font-nunito text-lg font-semibold text-primary">
+          <h3 className="font-dm-sans text-lg font-semibold text-primary">
             {title}
           </h3>
-          <p className="font-nunito text-sm text-muted">
+          <p className="font-dm-sans text-sm text-muted">
             Are you sure you want to commit, all your groups will see this
           </p>
         </div>
@@ -72,7 +72,7 @@ export default function CommitConfirmationModal({
             type="button"
             onClick={onConfirm}
             disabled={submitting}
-            className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg border-1 border-teal/30 bg-teal/10 py-2 font-nunito font-bold text-teal transition-colors hover:bg-teal/20 disabled:cursor-not-allowed disabled:opacity-60"
+            className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg border-1 border-teal/30 bg-teal/10 py-2 font-dm-sans font-bold text-teal transition-colors hover:bg-teal/20 disabled:cursor-not-allowed disabled:opacity-60"
           >
             <GitCommitHorizontal
               className="h-4 w-4"
@@ -85,7 +85,7 @@ export default function CommitConfirmationModal({
           <button
             type="button"
             onClick={onClose}
-            className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg border-1 border-border bg-surface py-2 font-nunito font-bold text-muted shadow-sm transition-colors hover:bg-border/50"
+            className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg border-1 border-border bg-surface py-2 font-dm-sans font-bold text-muted shadow-sm transition-colors hover:bg-border/50"
           >
             Cancel
           </button>

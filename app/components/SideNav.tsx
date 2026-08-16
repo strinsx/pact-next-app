@@ -285,10 +285,10 @@ export default function SideNav() {
         </div>
         {!collapsed && (
           <div className="flex min-w-0 flex-1 flex-col">
-            <span className="truncate font-poppins text-base font-bold text-purple">
+            <span className="truncate font-manrope text-base font-bold text-purple">
               {fullName ?? "Your Pact"}
             </span>
-            <span className="truncate font-nunito text-sm text-muted">
+            <span className="truncate font-dm-sans text-sm text-muted">
               {username ? `@${username}` : ""}
             </span>
           </div>
@@ -313,7 +313,7 @@ export default function SideNav() {
           type="button"
           title="Notifications"
           disabled
-          className={`flex items-center gap-3 py-1 font-nunito text-sm font-semibold text-muted opacity-50 cursor-not-allowed ${
+          className={`flex items-center gap-3 py-1 font-dm-sans text-sm font-semibold text-muted opacity-50 cursor-not-allowed ${
             collapsed ? "justify-center px-0" : "px-1"
           }`}
         >
@@ -324,7 +324,7 @@ export default function SideNav() {
           type="button"
           onClick={toggleTheme}
           title={theme === "dark" ? "Light Mode" : "Dark Mode"}
-          className={`flex items-center gap-3 py-1 font-nunito text-sm font-semibold text-muted transition-colors hover:text-primary ${
+          className={`flex items-center gap-3 py-1 font-dm-sans text-sm font-semibold text-muted transition-colors hover:text-primary ${
             collapsed ? "justify-center px-0" : "px-1"
           }`}
         >
@@ -339,7 +339,7 @@ export default function SideNav() {
           type="button"
           onClick={() => setCommitmentOptionsOpen(true)}
           title="Commitment"
-          className={`mt-2 flex items-center gap-2 rounded-lg border-1 border-border bg-surface font-nunito text-sm font-bold text-primary transition-colors hover:bg-border/50 ${
+          className={`mt-2 flex items-center gap-2 rounded-lg border-1 border-border bg-surface font-dm-sans text-sm font-bold text-primary transition-colors hover:bg-border/50 ${
             collapsed
               ? "justify-center px-2 py-2.5"
               : "justify-center px-4 py-2.5"
@@ -359,7 +359,7 @@ export default function SideNav() {
                 ? pathname === "/"
                 : pathname.startsWith(item.href) && !analysisActive;
 
-          const className = `flex items-center rounded-xl py-3 font-nunito text-sm font-semibold transition-colors ${
+          const className = `flex items-center rounded-xl py-3 font-dm-sans text-sm font-semibold transition-colors ${
             collapsed ? "justify-center px-0" : "justify-between px-4"
           } ${
             isActive
@@ -407,7 +407,7 @@ export default function SideNav() {
           type="button"
           onClick={() => setCreateGroupOpen(true)}
           title="Create Group"
-          className={`flex items-center gap-3 rounded-xl py-2 font-nunito text-sm font-semibold transition-colors ${
+          className={`flex items-center gap-3 rounded-xl py-2 font-dm-sans text-sm font-semibold transition-colors ${
             collapsed ? "justify-center px-0" : "px-4"
           } text-muted hover:bg-border/50 hover:text-primary`}
         >
@@ -418,7 +418,7 @@ export default function SideNav() {
           type="button"
           onClick={() => setJoinGroupOpen(true)}
           title="Join Group"
-          className={`flex items-center gap-3 rounded-xl py-2 font-nunito text-sm font-semibold transition-colors ${
+          className={`flex items-center gap-3 rounded-xl py-2 font-dm-sans text-sm font-semibold transition-colors ${
             collapsed ? "justify-center px-0" : "px-4"
           } text-muted hover:bg-border/50 hover:text-primary`}
         >
@@ -428,7 +428,7 @@ export default function SideNav() {
       </nav>
       {!collapsed && (
         <div className="mt-6 px-6">
-          <span className="font-nunito text-xs font-bold uppercase tracking-wide text-muted">
+          <span className="font-dm-sans text-xs font-bold uppercase tracking-wide text-muted">
             Management
           </span>
         </div>
@@ -438,7 +438,7 @@ export default function SideNav() {
           href="/groups"
           onClick={() => setMobileOpen(false)}
           title="Groups"
-          className={`flex items-center rounded-xl py-3 font-nunito text-sm font-semibold transition-colors ${
+          className={`flex items-center rounded-xl py-3 font-dm-sans text-sm font-semibold transition-colors ${
             collapsed ? "justify-center px-0" : "justify-between px-4"
           } ${
             pathname.startsWith("/groups")
@@ -464,7 +464,7 @@ export default function SideNav() {
                     scrollToSection(sub.id);
                     setMobileOpen(false);
                   }}
-                  className={`cursor-pointer rounded-lg py-1.5 pl-2 text-left font-nunito text-sm font-semibold transition-colors ${
+                  className={`cursor-pointer rounded-lg py-1.5 pl-2 text-left font-dm-sans text-sm font-semibold transition-colors ${
                     isSubActive
                       ? "text-secondary"
                       : "text-muted hover:text-primary"
@@ -482,7 +482,7 @@ export default function SideNav() {
         type="button"
         onClick={() => setConfirmOpen(true)}
         title="Logout"
-        className={`mt-auto flex items-center gap-3 py-5 font-nunito text-sm font-semibold text-muted transition-colors hover:text-red-500 ${
+        className={`mt-auto flex items-center gap-3 py-5 font-dm-sans text-sm font-semibold text-muted transition-colors hover:text-red-500 ${
           collapsed ? "justify-center px-0" : "px-7"
         }`}
       >
@@ -493,7 +493,7 @@ export default function SideNav() {
         type="button"
         onClick={() => setCollapsed((prev) => !prev)}
         title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-        className="hidden items-center justify-center border-t border-border py-3 font-nunito text-xs font-semibold text-muted transition-colors hover:text-primary md:flex"
+        className="hidden items-center justify-center border-t border-border py-3 font-dm-sans text-xs font-semibold text-muted transition-colors hover:text-primary md:flex"
       >
         {collapsed ? (
           <PanelLeftOpen className="h-4 w-4" />
@@ -516,24 +516,24 @@ export default function SideNav() {
             <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-red-500/10">
               <LogOut className="h-6 w-6 text-red-500" />
             </div>
-            <h2 className="mt-4 font-poppins text-xl font-bold text-primary">
+            <h2 className="mt-4 font-manrope text-xl font-bold text-primary">
               Sign out of Pact?
             </h2>
-            <p className="mt-1 font-nunito text-sm text-muted">
+            <p className="mt-1 font-dm-sans text-sm text-muted">
               You will need to sign back in to view your commitments.
             </p>
             <div className="mt-6 flex gap-3">
               <button
                 type="button"
                 onClick={() => setConfirmOpen(false)}
-                className="flex-1 cursor-pointer rounded-lg border-1 border-border bg-surface py-2 font-nunito font-bold text-muted transition-colors hover:bg-border/50 hover:text-primary"
+                className="flex-1 cursor-pointer rounded-lg border-1 border-border bg-surface py-2 font-dm-sans font-bold text-muted transition-colors hover:bg-border/50 hover:text-primary"
               >
                 Cancel
               </button>
               <button
                 type="button"
                 onClick={handleLogout}
-                className="flex-1 cursor-pointer rounded-lg bg-red-500 py-2 font-nunito font-bold text-white transition-colors hover:bg-red-600"
+                className="flex-1 cursor-pointer rounded-lg bg-red-500 py-2 font-dm-sans font-bold text-white transition-colors hover:bg-red-600"
               >
                 Sign out
               </button>

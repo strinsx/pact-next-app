@@ -32,7 +32,7 @@ export default function ErrorModal({ open, message, onClose }: ErrorModalProps) 
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between">
-          <h2 className="font-poppins text-xl font-bold text-red-500">
+          <h2 className="font-manrope text-xl font-bold text-red-500">
             Error
           </h2>
           <button
@@ -45,12 +45,12 @@ export default function ErrorModal({ open, message, onClose }: ErrorModalProps) 
         </div>
         <div className="mt-4 flex items-start gap-3 rounded-xl border-1 border-red-500/30 bg-red-500/10 px-4 py-3">
           <TriangleAlert className="h-5 w-5 shrink-0 text-red-500" />
-          <p className="font-nunito text-sm text-red-500">{message}</p>
+          <p className="font-dm-sans text-sm text-red-500">{message}</p>
         </div>
         <button
           type="button"
           onClick={onClose}
-          className="mt-6 w-full cursor-pointer rounded-lg border-1 border-red-500/30 bg-surface py-2 font-nunito font-bold text-red-500 shadow-sm transition-colors hover:bg-red-500/10"
+          className="mt-6 w-full cursor-pointer rounded-lg border-1 border-red-500/30 bg-surface py-2 font-dm-sans font-bold text-red-500 shadow-sm transition-colors hover:bg-red-500/10"
         >
           OK
         </button>

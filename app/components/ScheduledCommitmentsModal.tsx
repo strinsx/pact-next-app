@@ -124,7 +124,7 @@ export default function ScheduledCommitmentsModal({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between">
-          <h2 className="font-poppins text-xl font-bold text-primary">
+          <h2 className="font-manrope text-xl font-bold text-primary">
             Scheduled Commitments
           </h2>
           <button
@@ -135,12 +135,12 @@ export default function ScheduledCommitmentsModal({
             <X className="h-5 w-5" />
           </button>
         </div>
-        <p className="mt-1 text-left font-nunito text-sm text-muted">
+        <p className="mt-1 text-left font-dm-sans text-sm text-muted">
           Commitments scheduled for a future date
         </p>
 
         {items.length === 0 ? (
-          <p className="mt-6 text-center font-nunito text-sm text-muted">
+          <p className="mt-6 text-center font-dm-sans text-sm text-muted">
             No scheduled commitments yet.
           </p>
         ) : (
@@ -153,29 +153,29 @@ export default function ScheduledCommitmentsModal({
                 >
                   <div className="flex flex-col gap-4">
                     <div className="flex flex-col gap-1 text-left">
-                      <label className="font-poppins text-sm font-light text-secondary">
+                      <label className="font-manrope text-sm font-light text-secondary">
                         Title
                       </label>
                       <input
                         type="text"
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
-                        className="w-full rounded-xl border-1 border-border bg-surface px-4 py-2 font-nunito text-sm text-primary shadow-sm placeholder:text-muted focus:outline-none"
+                        className="w-full rounded-xl border-1 border-border bg-surface px-4 py-2 font-dm-sans text-sm text-primary shadow-sm placeholder:text-muted focus:outline-none"
                       />
                     </div>
                     <div className="flex flex-col gap-1 text-left">
-                      <label className="font-poppins text-sm font-light text-secondary">
+                      <label className="font-manrope text-sm font-light text-secondary">
                         Description
                       </label>
                       <textarea
                         rows={2}
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
-                        className="w-full resize-none rounded-xl border-1 border-border bg-surface px-4 py-2 font-nunito text-sm text-primary shadow-sm placeholder:text-muted focus:outline-none"
+                        className="w-full resize-none rounded-xl border-1 border-border bg-surface px-4 py-2 font-dm-sans text-sm text-primary shadow-sm placeholder:text-muted focus:outline-none"
                       />
                     </div>
                     <div className="flex flex-col gap-1 text-left">
-                      <label className="font-poppins text-sm font-light text-secondary">
+                      <label className="font-manrope text-sm font-light text-secondary">
                         Scheduled for
                       </label>
                       <DatePicker
@@ -185,7 +185,7 @@ export default function ScheduledCommitmentsModal({
                       />
                     </div>
                     <div className="flex flex-col gap-1 text-left">
-                      <label className="font-poppins text-sm font-light text-secondary">
+                      <label className="font-manrope text-sm font-light text-secondary">
                         Evaluation time
                       </label>
                       <TimePicker
@@ -198,14 +198,14 @@ export default function ScheduledCommitmentsModal({
                         type="button"
                         onClick={handleSave}
                         disabled={saving || !title.trim()}
-                        className="flex-1 cursor-pointer rounded-lg border-1 border-border bg-surface py-2 font-nunito font-bold text-primary shadow-sm transition-colors hover:bg-border/50 disabled:cursor-not-allowed disabled:opacity-60"
+                        className="flex-1 cursor-pointer rounded-lg border-1 border-border bg-surface py-2 font-dm-sans font-bold text-primary shadow-sm transition-colors hover:bg-border/50 disabled:cursor-not-allowed disabled:opacity-60"
                       >
                         {saving ? "Saving..." : "Save"}
                       </button>
                       <button
                         type="button"
                         onClick={() => setEditingId(null)}
-                        className="flex-1 cursor-pointer rounded-lg border-1 border-border bg-transparent py-2 font-nunito font-bold text-muted transition-colors hover:bg-border/50"
+                        className="flex-1 cursor-pointer rounded-lg border-1 border-border bg-transparent py-2 font-dm-sans font-bold text-muted transition-colors hover:bg-border/50"
                       >
                         Cancel
                       </button>
@@ -218,10 +218,10 @@ export default function ScheduledCommitmentsModal({
                   className="flex items-center justify-between rounded-xl border-1 border-border bg-background px-4 py-3"
                 >
                   <div className="flex flex-col text-left">
-                    <span className="font-nunito text-sm font-semibold text-primary">
+                    <span className="font-dm-sans text-sm font-semibold text-primary">
                       {item.title}
                     </span>
-                    <span className="mt-1 flex items-center gap-1 font-nunito text-xs text-muted">
+                    <span className="mt-1 flex items-center gap-1 font-dm-sans text-xs text-muted">
                       <CalendarClock className="h-3 w-3" />
                       {formatScheduledDate(item.scheduledFor)} at{" "}
                       {toHHMM(item.evaluationTime)}
@@ -231,7 +231,7 @@ export default function ScheduledCommitmentsModal({
                     <button
                       type="button"
                       onClick={() => startEdit(item)}
-                      className="flex cursor-pointer items-center gap-1 rounded-lg border-1 border-border bg-surface px-2 py-1 font-nunito text-xs font-bold text-secondary transition-colors hover:bg-secondary/10"
+                      className="flex cursor-pointer items-center gap-1 rounded-lg border-1 border-border bg-surface px-2 py-1 font-dm-sans text-xs font-bold text-secondary transition-colors hover:bg-secondary/10"
                     >
                       <Pencil className="h-3.5 w-3.5" />
                       Edit
@@ -239,7 +239,7 @@ export default function ScheduledCommitmentsModal({
                     <button
                       type="button"
                       onClick={() => setConfirmingDeleteId(item.id)}
-                      className="flex cursor-pointer items-center gap-1 rounded-lg border-1 border-red-500/30 bg-red-500/10 px-2 py-1 font-nunito text-xs font-bold text-red-500 transition-colors hover:bg-red-500/20"
+                      className="flex cursor-pointer items-center gap-1 rounded-lg border-1 border-red-500/30 bg-red-500/10 px-2 py-1 font-dm-sans text-xs font-bold text-red-500 transition-colors hover:bg-red-500/20"
                     >
                       <Trash2 className="h-3.5 w-3.5" />
                       Delete
@@ -263,10 +263,10 @@ export default function ScheduledCommitmentsModal({
               <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-red-500/10">
                 <Trash2 className="h-6 w-6 text-red-500" />
               </div>
-              <h2 className="mt-4 font-poppins text-xl font-bold text-primary">
+              <h2 className="mt-4 font-manrope text-xl font-bold text-primary">
                 Delete scheduled commitment?
               </h2>
-              <p className="mt-1 font-nunito text-sm text-muted">
+              <p className="mt-1 font-dm-sans text-sm text-muted">
                 This will permanently remove this commitment. This action cannot
                 be undone.
               </p>
@@ -274,14 +274,14 @@ export default function ScheduledCommitmentsModal({
                 <button
                   type="button"
                   onClick={() => setConfirmingDeleteId(null)}
-                  className="flex-1 cursor-pointer rounded-lg border-1 border-border bg-surface py-2 font-nunito font-bold text-muted transition-colors hover:bg-border/50 hover:text-primary"
+                  className="flex-1 cursor-pointer rounded-lg border-1 border-border bg-surface py-2 font-dm-sans font-bold text-muted transition-colors hover:bg-border/50 hover:text-primary"
                 >
                   Cancel
                 </button>
                 <button
                   type="button"
                   onClick={handleDelete}
-                  className="flex-1 cursor-pointer rounded-lg bg-red-500 py-2 font-nunito font-bold text-white transition-colors hover:bg-red-600"
+                  className="flex-1 cursor-pointer rounded-lg bg-red-500 py-2 font-dm-sans font-bold text-white transition-colors hover:bg-red-600"
                 >
                   Delete
                 </button>

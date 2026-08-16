@@ -106,7 +106,7 @@ export default function StatusModalComponent({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between">
-          <h2 className="font-poppins text-xl font-bold text-primary">
+          <h2 className="font-manrope text-xl font-bold text-primary">
             Commitment
           </h2>
           <button
@@ -119,10 +119,10 @@ export default function StatusModalComponent({
         </div>
 
         <div className="mt-4 flex items-center gap-2">
-          <span className="inline-flex items-center gap-2 rounded-full bg-secondary/10 px-3 py-1 font-nunito text-xs font-bold text-secondary">
+          <span className="inline-flex items-center gap-2 rounded-full bg-secondary/10 px-3 py-1 font-dm-sans text-xs font-bold text-secondary">
             {commitment.group}
           </span>
-          <span className="inline-flex items-center gap-2 rounded-full bg-purple/10 px-3 py-1 font-nunito text-xs font-bold text-purple">
+          <span className="inline-flex items-center gap-2 rounded-full bg-purple/10 px-3 py-1 font-dm-sans text-xs font-bold text-purple">
             {STATUS_OPTIONS.find((o) => o.value === commitment.status)?.label ??
               commitment.status}
           </span>
@@ -131,10 +131,10 @@ export default function StatusModalComponent({
         {confirmingDelete ? (
           <div className="mt-6 flex flex-col gap-6">
             <div className="flex flex-col gap-2 text-left">
-              <h3 className="font-nunito text-lg font-semibold text-primary">
+              <h3 className="font-dm-sans text-lg font-semibold text-primary">
                 Delete commitment?
               </h3>
-              <p className="font-nunito text-sm text-muted">
+              <p className="font-dm-sans text-sm text-muted">
                 This will permanently remove &quot;{commitment.title}&quot;.
                 This action cannot be undone.
               </p>
@@ -143,7 +143,7 @@ export default function StatusModalComponent({
               <button
                 type="button"
                 onClick={() => onDelete(commitment.id)}
-                className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg border-1 border-red-500/30 bg-red-500/10 py-2 font-nunito font-bold text-red-500 transition-colors hover:bg-red-500/20"
+                className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg border-1 border-red-500/30 bg-red-500/10 py-2 font-dm-sans font-bold text-red-500 transition-colors hover:bg-red-500/20"
               >
                 <Trash2 className="h-4 w-4" />
                 Delete
@@ -151,7 +151,7 @@ export default function StatusModalComponent({
               <button
                 type="button"
                 onClick={() => setConfirmingDelete(false)}
-                className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg border-1 border-border bg-transparent py-2 font-nunito font-bold text-muted transition-colors hover:bg-border/50"
+                className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg border-1 border-border bg-transparent py-2 font-dm-sans font-bold text-muted transition-colors hover:bg-border/50"
               >
                 Cancel
               </button>
@@ -160,29 +160,29 @@ export default function StatusModalComponent({
         ) : editing ? (
           <div className="mt-6 flex flex-col gap-4">
             <div className="flex flex-col gap-1 text-left">
-              <label className="font-poppins text-sm font-light text-secondary">
+              <label className="font-manrope text-sm font-light text-secondary">
                 Title
               </label>
               <input
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="w-full rounded-xl border-1 border-border bg-transparent px-4 py-2 font-nunito text-sm text-primary shadow-sm placeholder:text-muted focus:outline-none"
+                className="w-full rounded-xl border-1 border-border bg-transparent px-4 py-2 font-dm-sans text-sm text-primary shadow-sm placeholder:text-muted focus:outline-none"
               />
             </div>
             <div className="flex flex-col gap-1 text-left">
-              <label className="font-poppins text-sm font-light text-secondary">
+              <label className="font-manrope text-sm font-light text-secondary">
                 Description
               </label>
               <textarea
                 rows={3}
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                className="w-full resize-none rounded-xl border-1 border-border bg-transparent px-4 py-2 font-nunito text-sm text-primary shadow-sm placeholder:text-muted focus:outline-none"
+                className="w-full resize-none rounded-xl border-1 border-border bg-transparent px-4 py-2 font-dm-sans text-sm text-primary shadow-sm placeholder:text-muted focus:outline-none"
               />
             </div>
             <div className="flex flex-col gap-1 text-left">
-              <label className="font-poppins text-sm font-light text-secondary">
+              <label className="font-manrope text-sm font-light text-secondary">
                 Evaluation time
               </label>
               <TimePicker
@@ -195,14 +195,14 @@ export default function StatusModalComponent({
                 type="button"
                 onClick={handleSave}
                 disabled={!title.trim()}
-                className="flex-1 cursor-pointer rounded-lg border-1 border-border bg-surface py-2 font-nunito font-bold text-primary shadow-sm transition-colors hover:bg-border/50 disabled:cursor-not-allowed disabled:opacity-60"
+                className="flex-1 cursor-pointer rounded-lg border-1 border-border bg-surface py-2 font-dm-sans font-bold text-primary shadow-sm transition-colors hover:bg-border/50 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 Save
               </button>
               <button
                 type="button"
                 onClick={() => setEditing(false)}
-                className="flex-1 cursor-pointer rounded-lg border-1 border-border bg-transparent py-2 font-nunito font-bold text-muted transition-colors hover:bg-border/50"
+                className="flex-1 cursor-pointer rounded-lg border-1 border-border bg-transparent py-2 font-dm-sans font-bold text-muted transition-colors hover:bg-border/50"
               >
                 Cancel
               </button>
@@ -211,16 +211,16 @@ export default function StatusModalComponent({
         ) : (
           <div className="mt-6 flex flex-col gap-6">
             <div className="flex flex-col gap-1 text-left">
-              <h3 className="font-nunito text-lg font-semibold text-primary">
+              <h3 className="font-dm-sans text-lg font-semibold text-primary">
                 {commitment.title}
               </h3>
-              <p className="font-nunito text-sm text-muted">
+              <p className="font-dm-sans text-sm text-muted">
                 {commitment.description || "No description yet"}
               </p>
             </div>
 
             <div className="flex flex-col gap-1 text-left">
-              <label className="font-poppins text-sm font-light text-secondary">
+              <label className="font-manrope text-sm font-light text-secondary">
                 Status
               </label>
               <StatusDropdown
@@ -239,7 +239,7 @@ export default function StatusModalComponent({
                     : setConfirmingCommit(true)
                 }
                 disabled={submitting}
-                className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border-1 border-teal/30 bg-teal/10 py-2 font-nunito font-bold text-teal transition-colors hover:bg-teal/20 disabled:cursor-not-allowed disabled:opacity-60"
+                className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg border-1 border-teal/30 bg-teal/10 py-2 font-dm-sans font-bold text-teal transition-colors hover:bg-teal/20 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 <GitCommitHorizontal
                   className="h-4 w-4"
@@ -253,7 +253,7 @@ export default function StatusModalComponent({
                 <button
                   type="button"
                   onClick={() => setEditing(true)}
-                  className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg border-1 border-border bg-transparent py-2 font-nunito font-bold text-secondary transition-colors hover:bg-secondary/10"
+                  className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg border-1 border-border bg-transparent py-2 font-dm-sans font-bold text-secondary transition-colors hover:bg-secondary/10"
                 >
                   <Pencil className="h-4 w-4" />
                   Edit
@@ -261,7 +261,7 @@ export default function StatusModalComponent({
                 <button
                   type="button"
                   onClick={() => setConfirmingDelete(true)}
-                  className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg border-1 border-red-500/30 bg-red-500/10 py-2 font-nunito font-bold text-red-500 transition-colors hover:bg-red-500/20"
+                  className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg border-1 border-red-500/30 bg-red-500/10 py-2 font-dm-sans font-bold text-red-500 transition-colors hover:bg-red-500/20"
                 >
                   <Trash2 className="h-4 w-4" />
                   Delete

@@ -23,7 +23,7 @@ export default function LandingNavbar() {
             height={50}
             priority
           />
-          <span className="bg-gradient-to-r from-sky-400 to-purple bg-clip-text font-poppins text-2xl font-bold text-transparent">
+          <span className="bg-gradient-to-r from-sky-400 to-purple bg-clip-text font-manrope text-2xl font-bold text-transparent">
             Pact
           </span>
 
@@ -35,7 +35,7 @@ export default function LandingNavbar() {
             <Link
               key={link.href}
               href={link.href}
-              className="font-poppins text-md font-bold text-muted transition-all duration-300 hover:bg-gradient-to-r hover:from-purple hover:to-sky-400 hover:bg-clip-text hover:text-transparent"
+              className="font-manrope text-md font-bold text-muted transition-all duration-300 hover:bg-gradient-to-r hover:from-purple hover:to-sky-400 hover:bg-clip-text hover:text-transparent"
             >
               {link.label}
             </Link>
@@ -45,13 +45,13 @@ export default function LandingNavbar() {
         <div className="flex items-center gap-4">
           <Link
             href="/auth/login"
-            className="rounded-xl px-5 py-2.5 font-poppins text-sm font-bold text-primary transition-colors hover:text-secondary"
+            className="rounded-xl px-5 py-2.5 font-manrope text-sm font-bold text-primary transition-colors hover:text-secondary"
           >
             Sign in
           </Link>
           <Link
             href="/auth/signup"
-            className="rounded-xl border-1 border-border bg-gradient-to-r from-sky-400 to-purple px-5 py-2.5 font-nunito text-sm font-bold text-white shadow-lg transition-all duration-300 hover:translate-x-[8px] hover:opacity-90 hover:shadow-xl"
+            className="rounded-xl border-1 border-border bg-gradient-to-r from-sky-400 to-purple px-5 py-2.5 font-dm-sans text-sm font-bold text-white shadow-lg transition-all duration-300 hover:translate-x-[8px] hover:opacity-90 hover:shadow-xl"
           >
             Start your pact
           </Link>

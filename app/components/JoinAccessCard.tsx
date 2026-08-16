@@ -139,12 +139,12 @@ export default function JoinAccessCard() {
 
   return (
     <div className="w-full">
-      <h2 className="self-start font-poppins text-xl font-bold text-primary">
+      <h2 className="self-start font-manrope text-xl font-bold text-primary">
         Join Access
       </h2>
       {!isOwner && !loading ? (
         <div className="mt-4 rounded-2xl border-1 border-border bg-surface p-6">
-          <p className="text-left font-nunito text-sm text-muted">
+          <p className="text-left font-dm-sans text-sm text-muted">
             Invites are managed by the group owner. Only the owner can view
             pending requests and share the invite link.
           </p>
@@ -154,19 +154,19 @@ export default function JoinAccessCard() {
         <div className="min-h-50 rounded-2xl border-1 border-border bg-surface p-6">
           <div className="flex items-center gap-2">
             <Clock3 className="h-4 w-4 text-purple" />
-            <span className="font-nunito text-sm font-bold text-primary">
+            <span className="font-dm-sans text-sm font-bold text-primary">
               Pending Requests
             </span>
           </div>
           {loading ? (
             <div className="flex min-h-32 items-center justify-center">
-              <p className="text-center font-nunito text-sm text-muted">
+              <p className="text-center font-dm-sans text-sm text-muted">
                 Loading requests...
               </p>
             </div>
           ) : pendingRequests.length === 0 ? (
             <div className="flex min-h-32 items-center justify-center">
-              <p className="text-center font-nunito text-sm text-muted">
+              <p className="text-center font-dm-sans text-sm text-muted">
                 no pending requests right now
               </p>
             </div>
@@ -183,15 +183,15 @@ export default function JoinAccessCard() {
                       className="flex w-full cursor-pointer items-center justify-between rounded-xl border-1 border-border bg-background px-3 py-2 text-left transition-colors hover:border-secondary"
                     >
                       <div className="flex items-center gap-3">
-                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-purple/10 font-nunito text-xs font-bold text-purple">
+                        <div className="flex h-8 w-8 items-center justify-center rounded-full bg-purple/10 font-dm-sans text-xs font-bold text-purple">
                           {initial}
                         </div>
-                        <span className="font-nunito text-sm font-bold text-primary">
+                        <span className="font-dm-sans text-sm font-bold text-primary">
                           {fullName ?? "Unknown"}
                         </span>
                       </div>
                       <span className="flex items-center gap-1">
-                        <span className="rounded-full bg-purple/10 px-2.5 py-0.5 font-nunito text-xs font-bold text-purple">
+                        <span className="rounded-full bg-purple/10 px-2.5 py-0.5 font-dm-sans text-xs font-bold text-purple">
                           Pending
                         </span>
                         <ChevronRight className="h-4 w-4 text-muted" />
@@ -206,7 +206,7 @@ export default function JoinAccessCard() {
         <div className="rounded-2xl border-1 border-border bg-surface p-6">
           <div className="flex items-center gap-2">
             <Link2 className="h-4 w-4 text-secondary" />
-            <span className="font-nunito text-sm font-bold text-primary">
+            <span className="font-dm-sans text-sm font-bold text-primary">
               Invite Link
             </span>
           </div>
@@ -215,20 +215,20 @@ export default function JoinAccessCard() {
               type="button"
               onClick={handleGenerate}
               disabled={loading || !inviteCode}
-              className="flex w-fit cursor-pointer items-center gap-2 rounded-lg border-1 border-border bg-surface px-4 py-2 font-nunito text-sm font-bold text-primary shadow-sm transition-colors hover:bg-border/50 disabled:cursor-not-allowed disabled:opacity-60"
+              className="flex w-fit cursor-pointer items-center gap-2 rounded-lg border-1 border-border bg-surface px-4 py-2 font-dm-sans text-sm font-bold text-primary shadow-sm transition-colors hover:bg-border/50 disabled:cursor-not-allowed disabled:opacity-60"
             >
               <LinkIcon className="h-4 w-4" />
               Generate join link
             </button>
             {joinLink && (
               <div className="flex items-center gap-2 rounded-xl border-1 border-border bg-background px-3 py-2">
-                <span className="flex-1 truncate font-nunito text-xs text-muted">
+                <span className="flex-1 truncate font-dm-sans text-xs text-muted">
                   {joinLink}
                 </span>
                 <button
                   type="button"
                   onClick={handleCopyLink}
-                  className="flex shrink-0 cursor-pointer items-center gap-1 rounded-lg px-2 py-1 font-nunito text-xs font-bold text-secondary transition-colors hover:bg-secondary/10"
+                  className="flex shrink-0 cursor-pointer items-center gap-1 rounded-lg px-2 py-1 font-dm-sans text-xs font-bold text-secondary transition-colors hover:bg-secondary/10"
                 >
                   <Copy className="h-3.5 w-3.5" />
                   {copied ? "Copied" : "Copy"}
@@ -237,16 +237,16 @@ export default function JoinAccessCard() {
             )}
             {joinLink && inviteCode && (
               <div className="rounded-xl border-1 border-dashed border-secondary/40 bg-background p-4 text-center">
-                <p className="font-nunito text-xs font-semibold uppercase tracking-wide text-muted">
+                <p className="font-dm-sans text-xs font-semibold uppercase tracking-wide text-muted">
                   Invite code
                 </p>
-                <p className="mt-1 font-poppins text-2xl font-bold tracking-[0.25em] text-primary">
+                <p className="mt-1 font-manrope text-2xl font-bold tracking-[0.25em] text-primary">
                   {inviteCode}
                 </p>
                 <button
                   type="button"
                   onClick={handleCopyCode}
-                  className="mt-2 flex w-fit cursor-pointer items-center gap-1 rounded-lg border-1 border-border bg-surface px-3 py-1.5 font-nunito text-xs font-bold text-primary shadow-sm transition-colors hover:bg-border/50"
+                  className="mt-2 flex w-fit cursor-pointer items-center gap-1 rounded-lg border-1 border-border bg-surface px-3 py-1.5 font-dm-sans text-xs font-bold text-primary shadow-sm transition-colors hover:bg-border/50"
                 >
                   <Copy className="h-3.5 w-3.5" />
                   {codeCopied ? "Copied" : "Copy code"}
@@ -267,15 +267,15 @@ export default function JoinAccessCard() {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-xl bg-purple/10">
-              <span className="font-poppins text-xl font-bold text-purple">
+              <span className="font-manrope text-xl font-bold text-purple">
                 {selectedRequest.profiles?.full_name?.charAt(0).toUpperCase() ??
                   "?"}
               </span>
             </div>
-            <h2 className="mt-4 font-poppins text-xl font-bold text-primary">
+            <h2 className="mt-4 font-manrope text-xl font-bold text-primary">
               Review join request
             </h2>
-            <p className="mt-1 font-nunito text-sm text-muted">
+            <p className="mt-1 font-dm-sans text-sm text-muted">
               {selectedRequest.profiles?.full_name?.trim() ?? "Unknown"} wants
               to join your group.
             </p>
@@ -284,7 +284,7 @@ export default function JoinAccessCard() {
                 type="button"
                 onClick={() => handleReview(false)}
                 disabled={processing}
-                className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg border-1 border-border bg-surface py-2 font-nunito font-bold text-red-500 transition-colors hover:bg-red-500/10 disabled:cursor-not-allowed disabled:opacity-60"
+                className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg border-1 border-border bg-surface py-2 font-dm-sans font-bold text-red-500 transition-colors hover:bg-red-500/10 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 Reject
               </button>
@@ -292,7 +292,7 @@ export default function JoinAccessCard() {
                 type="button"
                 onClick={() => handleReview(true)}
                 disabled={processing}
-                className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-teal to-emerald-500 py-2 font-nunito font-bold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+                className="flex flex-1 cursor-pointer items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-teal to-emerald-500 py-2 font-dm-sans font-bold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {processing ? "Processing..." : "Approve"}
               </button>

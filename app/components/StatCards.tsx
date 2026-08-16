@@ -54,7 +54,7 @@ export default function StatCards() {
 
   return (
     <div className="flex w-full flex-col items-center gap-4">
-      <h2 className="self-start font-poppins text-xl font-bold text-primary">
+      <h2 className="self-start font-manrope text-xl font-bold text-primary">
         Your Personal Stats
       </h2>
       <div className="flex flex-wrap justify-center gap-6">
@@ -64,10 +64,10 @@ export default function StatCards() {
             className="flex w-full flex-col gap-2 rounded-2xl border-1 border-border bg-surface p-6 text-left sm:w-100"
           >
             <stat.icon className="h-5 w-5 text-muted" />
-            <span className="bg-gradient-to-r from-purple to-secondary bg-clip-text font-poppins text-3xl font-bold text-transparent">
+            <span className="bg-gradient-to-r from-purple to-secondary bg-clip-text font-manrope text-3xl font-bold text-transparent">
               {stat.value}
             </span>
-            <span className="font-nunito text-sm text-muted">{stat.label}</span>
+            <span className="font-dm-sans text-sm text-muted">{stat.label}</span>
           </div>
         ))}
       </div>
