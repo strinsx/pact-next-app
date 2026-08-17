@@ -5,25 +5,50 @@
 :root {
   --background: #f6f7fc;
   --foreground: #171717;
+  --card: #ffffff;
+  --card-foreground: #171717;
+  --popover: #ffffff;
+  --popover-foreground: #171717;
   --primary: #1f2a5a;
+  --primary-foreground: #ffffff;
   --secondary: #4a90f5;
+  --secondary-foreground: #ffffff;
   --teal: #56d9c8;
   --purple: #a37af7;
   --muted: #5c6b8a;
+  --muted-foreground: #5c6b8a;
+  --accent: #e8ecf8;
+  --accent-foreground: #1f2a5a;
+  --destructive: #e5484d;
   --border: #e4e7f5;
+  --input: #e4e7f5;
+  --ring: #4a90f5;
   --surface: #ffffff;
+  --radius: 0.5rem;
   color-scheme: light;
 }
 
 .dark {
   --background: #0e1230;
   --foreground: #edeffb;
+  --card: #171b42;
+  --card-foreground: #edeffb;
+  --popover: #171b42;
+  --popover-foreground: #edeffb;
   --primary: #edeffb;
+  --primary-foreground: #0e1230;
   --secondary: #4a90f5;
+  --secondary-foreground: #ffffff;
   --teal: #56d9c8;
   --purple: #a37af7;
   --muted: #9aa3cc;
+  --muted-foreground: #9aa3cc;
+  --accent: #23295c;
+  --accent-foreground: #edeffb;
+  --destructive: #ff6369;
   --border: #2c3168;
+  --input: #2c3168;
+  --ring: #4a90f5;
   --surface: #171b42;
   color-scheme: dark;
 }
@@ -31,12 +56,24 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
   --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
   --color-teal: var(--teal);
   --color-purple: var(--purple);
   --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
   --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
   --color-surface: var(--surface);
   --font-sans: var(--font-dm-sans);
   --font-manrope: var(--font-manrope);
