@@ -26,7 +26,8 @@ Build out a Pact accountability Next.js app's auth flow (Supabase email + Google
 - **Auth callback** `app/auth/callback/page.tsx` — creates profile from Google `user_metadata.full_name ?? name` if missing, redirects by username presence.
 - **`app/lib/auth/redirect.ts`** — `getPostAuthDestination(userId)` returns `/` if username exists else `/auth/onboarding`.
 - **Onboarding** `app/components/Onboarding.tsx` + `app/auth/onboarding/page.tsx` — "Hello {firstName}", username field saved to `profiles.username`, redirects `/`.
-- **SideNav** `app/components/SideNav.tsx` — now collapsible (icon-only `w-20` when collapsed), sticky `h-screen` so it never exceeds viewport; top content (profile header, Notifications, Dark Mode, + Commitment) scrolls internally, Logout + Collapse pinned at bottom. Main nav: Dashboard `/home`, Analysis `/analysis`, Profile `/profile` — all with right-aligned `ChevronRight`. "Management" heading above Groups `/groups`. Dark Mode/Notifications/Commitment buttons are UI-only (no handlers yet).
+- **SideNav** `app/components/SideNav.tsx` — collapsible (icon-only `w-20` when collapsed), sticky `h-screen` so it never exceeds viewport; logo + + Commitment at top, nav (Dashboard `/home`, Analysis `/analysis`, Profile `/profile` — rounded-xl gradient active state, right-aligned `ChevronRight`), "Management" heading above Groups `/groups` + sub-section links; Create Group / Join Group buttons; Logout + Collapse pinned at bottom. Profile name, Notifications and theme toggle were moved out to TopBar.
+- **TopBar** `app/components/TopBar.tsx` — sticky top-right navbar ordered Commitment button → Notifications bell → Sun/Moon theme toggle → avatar initial + full name chip (via `lib/theme.ts`), hosts the `CommitmentOptionsModal`/`CommitmentModal` create flow; rendered by home/profile/groups page shells in a `flex-col` column beside SideNav.
 - **Home** — `app/home/page.tsx` (SideNav + content), `app/page.tsx` redirects to `/home`; protected via `getUser()`; username-exists guard; `m-auto` wrapper fixed scroll clipping caused by `justify-center`.
 - **StatCards.tsx** — mock Personal Stats (Completion Rate 86%, Commitments 12, Day Streak 7), gradient values purple→secondary.
 - **CommitmentCard.tsx** — mock commitments with status badges (teal/blue/purple), Create button opens modal, subtitle "Be specific - your group will see this".
@@ -36,6 +37,8 @@ Build out a Pact accountability Next.js app's auth flow (Supabase email + Google
 - **Group section** — Groups heading → **GroupRankingCard.tsx** (mock horizontal gradient bars with "ranking for this month" / "who has been the most consistent" muted text).
 - **GroupFeedCard.tsx** — full-width, Discord-style emoji reactions (chips that toggle on click + "+" button that adds next emoji from `emojiPool`), working add-comment input (Enter/Send), posts have group leader crown. Feed list is a `h-96` scrollable container using `.feed-scroll` class (thin `--color-secondary` webkit scrollbar in globals.css). 4 mock posts (albert, sarah, mike, priya). Comment icon/count removed per request.
 - **Lucide refactor** — removed all FontAwesome from SignUp, Login, Onboarding, SideNav.
+- **commitment_daily_status schema + wiring** — `supabase/commitment_daily_status.sql` (table, indexes, RLS). `createCommitment` seeds pending rows for this week (routine = schedule days from today, scheduled = in-week date, standard = today); `submitCommitment` upserts the row to `completed`/`missed` (completed_at/evaluated_at); `getCommitmentsKeptThisWeek(profileId)` lazily backfills current-week row for recurring routines and returns per-day completed/missed.
+- **CommitmentsKeptThisWeek** `app/components/CommitmentsKeptThisWeek.tsx` — Mon-Sun rows with gradient progress bars (sky→purple), kept (teal check) / missed (red x) counts, weekly kept·missed badge; reloads on `emitDataChanged`; placed full-width under CommitmentCard in Home.
 - **globals.css** — added `.feed-scroll` custom webkit scrollbar (8px, `--color-secondary` thumb, `--color-purple` on hover; `scrollbar-width: thin` for Firefox).
 - **Home.tsx currently has pre-existing eslint warnings**: unused `firstName`/`username` state (welcome heading was removed).
 
@@ -58,6 +61,7 @@ Build out a Pact accountability Next.js app's auth flow (Supabase email + Google
 - Build the pending routes referenced by SideNav: `/analysis`, `/groups/create`, `/groups/join`, `/groups` (currently 404).
 - Wire up Dark Mode (globals.css has a commented-out dark mode block), Notifications, and + Commitment buttons in SideNav.
 - Connect commitment modal and feed reactions/comments to Supabase (currently client-state mock).
+- `commitment_daily_status` rows for recurring routines roll forward lazily at read time (today→Sun of current week). Future weeks are only seeded when read; consider a pg_cron job or DB trigger to mark evaluated/expired dates as `missed` + roll rows forward automatically.
 - Decide whether the welcome heading + firstName/username should return to Home, or remove the unused state to clear lint warnings.
 - Optionally add server-side route protection (`middleware.ts` + `createServerClient`) — current protection is client-side.
 - Verify Google OAuth redirect URL `/auth/callback` is whitelisted in Supabase auth settings.
@@ -75,9 +79,12 @@ Build out a Pact accountability Next.js app's auth flow (Supabase email + Google
 - `app/components/SignUp.tsx`, `app/components/Login.tsx`: email + Google auth flows.
 - `app/auth/callback/page.tsx`: OAuth callback, profile creation fallback, destination redirect.
 - `app/auth/onboarding/page.tsx`, `app/components/Onboarding.tsx`: username onboarding.
-- `app/components/SideNav.tsx`: collapsible sticky sidebar, profile header, Notifications/Dark Mode/Commitment buttons, nav, logout, collapse toggle.
+- `app/components/SideNav.tsx`: collapsible sticky sidebar, + nav, logout, collapse toggle.
+- `app/components/TopBar.tsx`: sticky top-right bar (Commitment → Notifications → theme → profile chip), hosts the commitment create flow (shared by home/profile/groups shells).
 - `app/home/page.tsx`, `app/page.tsx`: protected dashboard layout; `/` redirects to `/home`.
 - `app/components/Home.tsx`: dashboard composition (StatCards, CommitmentCard, analysis cards, Group section).
 - `app/components/StatCards.tsx`, `CommitmentCard.tsx`, `CommitmentModal.tsx`, `MonthlyAnalysisCard.tsx` (Daily Commitments), `WeeklyAnalysisCard.tsx`, `AreaChart.tsx`, `GroupFeedCard.tsx`, `GroupRankingCard.tsx`: dashboard card components.
 - `app/globals.css`: theme tokens incl. `--color-teal`/`--color-purple` + `.feed-scroll` webkit scrollbar.
+- `supabase/commitment_daily_status.sql`: per-commitment-per-date status table (RLS owner policies) used by CommitmentsKeptThisWeek.
+- `supabase/feed_posts.sql`, `supabase/feed_posts_cleanup.sql`: feed posts + pg_cron expiry cleanup.
 - `app/components/Navbar.tsx`: marketing navbar (links to `/home`, `/about`, `/features`, `/auth/signup`), still references `/about`/`/features` routes that may not exist.

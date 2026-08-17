@@ -109,9 +109,34 @@ export const nextRoutineDate = (
   return todayKey;
 };
 
+const dailyStatusDatesForCreation = (input: NewCommitment): string[] => {
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const monday = startOfWeekDate(today);
+  const dates: string[] = [];
+
+  for (let i = 0; i < 7; i++) {
+    const day = addDays(monday, i);
+    if (day.getTime() < today.getTime()) continue;
+    const key = formatLocalDate(day);
+    const dayNum = day.getDay() === 0 ? 7 : day.getDay();
+
+    if (input.commitmentType === "routine") {
+      if (input.scheduleDays.includes(dayNum)) dates.push(key);
+    } else if (input.commitmentType === "scheduled") {
+      if (key === (input.scheduledFor || "").slice(0, 10)) dates.push(key);
+    } else if (key === formatLocalDate(today)) {
+      dates.push(key);
+    }
+  }
+
+  return dates;
+};
+
 export async function createCommitment(input: NewCommitment) {
   const supabase = createClient();
-  return supabase
+
+  const result = await supabase
     .from("commitments")
     .insert({
       profile_id: input.profileId,
@@ -132,12 +157,60 @@ export async function createCommitment(input: NewCommitment) {
         input.commitmentType === "scheduled" ? input.scheduledFor || null : null,
       evaluation_time: input.evaluationTime,
     })
-    .select("id, title")
+    .select("id, title, commitment_date")
     .single();
+
+  if (result.data?.id) {
+    const statusDates = dailyStatusDatesForCreation(input);
+    if (statusDates.length > 0) {
+      const { error: statusError } = await supabase
+        .from("commitment_daily_status")
+        .insert(
+          statusDates.map((date) => ({
+            commitment_id: result.data.id,
+            profile_id: input.profileId,
+            commitment_date: date,
+            status: "pending",
+          }))
+        );
+      if (statusError) {
+        console.error(
+          "[commitment] failed to seed daily status:",
+          statusError.message
+        );
+      }
+    }
+  }
+
+  return result;
 }
 
 export async function submitCommitment(id: string, status: string) {
   const supabase = createClient();
+
+  const { data: commitment } = await supabase
+    .from("commitments")
+    .select("commitment_date, profile_id")
+    .eq("id", id)
+    .maybeSingle();
+
+  if (commitment?.commitment_date) {
+    const isCompleted = status === "submitted";
+    await supabase
+      .from("commitment_daily_status")
+      .upsert(
+        {
+          commitment_id: id,
+          profile_id: commitment.profile_id,
+          commitment_date: commitment.commitment_date.slice(0, 10),
+          status: isCompleted ? "completed" : "missed",
+          completed_at: isCompleted ? new Date().toISOString() : null,
+          evaluated_at: new Date().toISOString(),
+        },
+        { onConflict: "commitment_id,commitment_date" }
+      );
+  }
+
   return supabase
     .from("commitments")
     .update({ status, submitted_at: new Date().toISOString() })
@@ -684,4 +757,139 @@ export async function getStatsWithDelta(
       ),
     },
   };
+}
+
+export interface TodayDailyStatus {
+  completed: number;
+  missed: number;
+}
+
+export async function getTodayDailyStatus(
+  profileId: string
+): Promise<TodayDailyStatus> {
+  const supabase = createClient();
+  const today = formatLocalDate(new Date());
+
+  const { data } = await supabase
+    .from("commitment_daily_status")
+    .select("status")
+    .eq("profile_id", profileId)
+    .eq("commitment_date", today);
+
+  let completed = 0;
+  let missed = 0;
+  for (const row of (data ?? []) as { status: string }[]) {
+    if (row.status === "completed") completed += 1;
+    else if (row.status === "missed") missed += 1;
+  }
+
+  return { completed, missed };
+}
+
+export interface WeekDayStatus {
+  date: string;
+  label: string;
+  completed: number;
+  missed: number;
+}
+
+export interface CommitmentsKeptWeek {
+  days: WeekDayStatus[];
+  kept: number;
+  missed: number;
+}
+
+export async function getCommitmentsKeptThisWeek(
+  profileId: string
+): Promise<CommitmentsKeptWeek> {
+  const supabase = createClient();
+
+  const monday = startOfWeekDate(new Date());
+  const from = formatLocalDate(monday);
+  const to = formatLocalDate(addDays(monday, 6));
+
+  const { data: commitments } = await supabase
+    .from("commitments")
+    .select("id, commitment_type, schedule_days")
+    .eq("profile_id", profileId);
+
+  const { data: statusRows } = await supabase
+    .from("commitment_daily_status")
+    .select("commitment_id, commitment_date, status")
+    .eq("profile_id", profileId)
+    .gte("commitment_date", from)
+    .lte("commitment_date", to);
+
+  const existing = new Set(
+    ((statusRows ?? []) as { commitment_id: string; commitment_date: string }[]).map(
+      (r) => `${r.commitment_id}|${r.commitment_date}`
+    )
+  );
+
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const toInsert: {
+    commitment_id: string;
+    commitment_date: string;
+    status: string;
+  }[] = [];
+
+  for (const commitment of (commitments ?? []) as {
+    id: string;
+    commitment_type: string;
+    schedule_days: number[] | null;
+  }[]) {
+    if (
+      commitment.commitment_type !== "routine" ||
+      !Array.isArray(commitment.schedule_days)
+    ) {
+      continue;
+    }
+
+    for (let i = 0; i < 7; i++) {
+      const day = addDays(monday, i);
+      if (day.getTime() < today.getTime()) continue;
+      const key = formatLocalDate(day);
+      const dayNum = day.getDay() === 0 ? 7 : day.getDay();
+      if (!commitment.schedule_days.includes(dayNum)) continue;
+      if (existing.has(`${commitment.id}|${key}`)) continue;
+      toInsert.push({ commitment_id: commitment.id, commitment_date: key, status: "pending" });
+    }
+  }
+
+  if (toInsert.length > 0) {
+    await supabase.from("commitment_daily_status").insert(
+      toInsert.map((row) => ({ ...row, profile_id: profileId }))
+    );
+  }
+
+  const byDay = new Map<string, { completed: number; missed: number }>();
+  for (const row of (statusRows ?? []) as {
+    commitment_date: string;
+    status: string;
+  }[]) {
+    const day = String(row.commitment_date).slice(0, 10);
+    const entry = byDay.get(day) ?? { completed: 0, missed: 0 };
+    if (row.status === "completed") entry.completed += 1;
+    else if (row.status === "missed") entry.missed += 1;
+    byDay.set(day, entry);
+  }
+
+  const days: WeekDayStatus[] = [];
+  for (let i = 0; i < 7; i++) {
+    const day = addDays(monday, i);
+    const key = formatLocalDate(day);
+    const entry = byDay.get(key) ?? { completed: 0, missed: 0 };
+    days.push({
+      date: key,
+      label: day.toLocaleString("en", { weekday: "short" }),
+      ...entry,
+    });
+  }
+
+  const kept = days.reduce((sum, d) => sum + d.completed, 0);
+  const missed = days.reduce((sum, d) => sum + d.missed, 0);
+
+  return { days, kept, missed };
 }

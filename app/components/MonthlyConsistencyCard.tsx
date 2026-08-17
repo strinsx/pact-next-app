@@ -2,7 +2,18 @@
 
 import { Flame } from "lucide-react";
 import { useEffect, useState } from "react";
-import AreaChart from "@/app/components/AreaChart";
+import {
+  Area,
+  AreaChart as RechartsAreaChart,
+  CartesianGrid,
+  XAxis,
+} from "recharts";
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  type ChartConfig,
+} from "@/app/components/ui/chart";
 import { getCurrentUser } from "@/app/lib/services/auth";
 import { getProfileByUserId } from "@/app/lib/services/profile";
 import {
@@ -10,6 +21,13 @@ import {
   MonthlyConsistencyDatum,
 } from "@/app/lib/services/commitments";
 import { subscribeDataChanged } from "@/app/lib/events";
+
+const chartConfig: ChartConfig = {
+  value: {
+    label: "Consistency",
+    color: "#4a90f5",
+  },
+};
 
 export default function MonthlyConsistencyCard() {
   const [data, setData] = useState<MonthlyConsistencyDatum[]>([]);
@@ -57,19 +75,46 @@ export default function MonthlyConsistencyCard() {
         </span>
       </div>
       <div className="mt-6">
-        <AreaChart
-          data={data}
-          from="#56d9c8"
-          to="#4a90f5"
-          id="monthlyGrad"
-        />
-        <div className="mt-2 flex justify-between">
-          {data.map((month) => (
-            <span key={month.label} className="font-dm-sans text-xs text-muted">
-              {month.label}
-            </span>
-          ))}
-        </div>
+        <ChartContainer config={chartConfig} className="aspect-auto h-36 w-full">
+          <RechartsAreaChart
+            data={data}
+            margin={{ left: 0, right: 0, top: 0, bottom: 0 }}
+          >
+            <defs>
+              <linearGradient id="fillValue" x1="0" y1="0" x2="0" y2="1">
+                <stop
+                  offset="5%"
+                  stopColor="var(--color-value)"
+                  stopOpacity={0.5}
+                />
+                <stop
+                  offset="95%"
+                  stopColor="#56d9c8"
+                  stopOpacity={0}
+                />
+              </linearGradient>
+            </defs>
+            <CartesianGrid vertical={false} strokeDasharray="3 3" />
+            <XAxis
+              dataKey="label"
+              tickLine={false}
+              axisLine={false}
+              tickMargin={10}
+              tick={{ fontSize: 12 }}
+            />
+            <ChartTooltip
+              cursor={false}
+              content={<ChartTooltipContent hideLabel />}
+            />
+            <Area
+              dataKey="value"
+              type="monotone"
+              fill="url(#fillValue)"
+              stroke="var(--color-value)"
+              strokeWidth={2}
+            />
+          </RechartsAreaChart>
+        </ChartContainer>
       </div>
     </div>
   );
