@@ -9,12 +9,8 @@ import {
   CircleUser,
   LayoutGrid,
   LogOut,
-  Moon,
-  Sun,
-  Plus,
   ChevronRight,
   Users,
-  Bell,
   UserRoundPlus,
   UserPlus,
   PanelLeftClose,
@@ -23,15 +19,9 @@ import {
   X,
   type LucideIcon,
 } from "lucide-react";
-import { getCurrentUser, signOut } from "@/app/lib/services/auth";
-import { getProfileByUserId } from "@/app/lib/services/profile";
-import { toHHMM } from "@/app/lib/services/commitments";
-import { CommitmentType } from "@/app/lib/commitments";
-import { useTheme, toggleTheme } from "@/app/lib/theme";
+import { signOut } from "@/app/lib/services/auth";
 import CreateGroupModal from "@/app/components/CreateGroupModal";
 import JoinGroupModal from "@/app/components/JoinGroupModal";
-import CommitmentOptionsModal from "@/app/components/CommitmentOptionsModal";
-import CommitmentModal from "@/app/components/CommitmentModal";
 
 interface NavItem {
   href: string;
@@ -155,19 +145,11 @@ const scrollToElement = (id: string) => {
 export default function SideNav() {
   const pathname = usePathname();
   const router = useRouter();
-  const theme = useTheme();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [fullName, setFullName] = useState<string | null>(null);
-  const [username, setUsername] = useState<string | null>(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [createGroupOpen, setCreateGroupOpen] = useState(false);
   const [joinGroupOpen, setJoinGroupOpen] = useState(false);
-  const [commitmentOptionsOpen, setCommitmentOptionsOpen] = useState(false);
-  const [commitmentOpen, setCommitmentOpen] = useState(false);
-  const [commitmentType, setCommitmentType] =
-    useState<CommitmentType>("standard");
-  const [evaluationTime, setEvaluationTime] = useState("23:59");
   const activeSection = useSyncExternalStore(
     subscribeToScroll,
     getActiveSection,
@@ -200,28 +182,6 @@ export default function SideNav() {
     scrollToElement("analytics");
     setMobileOpen(false);
   };
-
-  useEffect(() => {
-    const loadProfile = async () => {
-      const user = await getCurrentUser();
-      if (!user) return;
-
-      const { data: profile } = await getProfileByUserId(
-        user.id,
-        "full_name, username, evaluation_time"
-      );
-
-      if (profile) {
-        setFullName(profile.full_name);
-        setUsername(profile.username);
-        if (profile.evaluation_time) {
-          setEvaluationTime(toHHMM(profile.evaluation_time));
-        }
-      }
-    };
-
-    loadProfile();
-  }, []);
 
   const handleLogout = async () => {
     await signOut();
@@ -283,16 +243,6 @@ export default function SideNav() {
         <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-secondary/10">
           <LayoutGrid className="h-6 w-6 text-primary" />
         </div>
-        {!collapsed && (
-          <div className="flex min-w-0 flex-1 flex-col">
-            <span className="truncate font-manrope text-base font-bold text-purple">
-              {fullName ?? "Your Pact"}
-            </span>
-            <span className="truncate font-dm-sans text-sm text-muted">
-              {username ? `@${username}` : ""}
-            </span>
-          </div>
-        )}
         <button
           type="button"
           onClick={() => setMobileOpen(false)}
@@ -302,51 +252,6 @@ export default function SideNav() {
           }`}
         >
           <X className="h-5 w-5" />
-        </button>
-      </div>
-      <div
-        className={`flex flex-col gap-1 pb-4 ${
-          collapsed ? "items-center px-0" : "px-6"
-        }`}
-      >
-        <button
-          type="button"
-          title="Notifications"
-          disabled
-          className={`flex items-center gap-3 py-1 font-dm-sans text-sm font-semibold text-muted opacity-50 cursor-not-allowed ${
-            collapsed ? "justify-center px-0" : "px-1"
-          }`}
-        >
-          <Bell className="h-4 w-4 shrink-0" />
-          {!collapsed && "Notifications"}
-        </button>
-        <button
-          type="button"
-          onClick={toggleTheme}
-          title={theme === "dark" ? "Light Mode" : "Dark Mode"}
-          className={`flex items-center gap-3 py-1 font-dm-sans text-sm font-semibold text-muted transition-colors hover:text-primary ${
-            collapsed ? "justify-center px-0" : "px-1"
-          }`}
-        >
-          {theme === "dark" ? (
-            <Sun className="h-4 w-4 shrink-0" />
-          ) : (
-            <Moon className="h-4 w-4 shrink-0" />
-          )}
-          {!collapsed && (theme === "dark" ? "Light Mode" : "Dark Mode")}
-        </button>
-        <button
-          type="button"
-          onClick={() => setCommitmentOptionsOpen(true)}
-          title="Commitment"
-          className={`mt-2 flex items-center gap-2 rounded-lg border-1 border-border bg-surface font-dm-sans text-sm font-bold text-primary transition-colors hover:bg-border/50 ${
-            collapsed
-              ? "justify-center px-2 py-2.5"
-              : "justify-center px-4 py-2.5"
-          }`}
-        >
-          <Plus className="h-4 w-4 shrink-0" />
-          {!collapsed && "Commitment"}
         </button>
       </div>
       <nav className="flex flex-col gap-2 px-3">
@@ -359,7 +264,7 @@ export default function SideNav() {
                 ? pathname === "/"
                 : pathname.startsWith(item.href) && !analysisActive;
 
-          const className = `flex items-center rounded-xl py-3 font-dm-sans text-sm font-semibold transition-colors ${
+          const className = `flex items-center rounded-xl py-3 font-dm-sans text-sm transition-colors ${
             collapsed ? "justify-center px-0" : "justify-between px-4"
           } ${
             isActive
@@ -407,7 +312,7 @@ export default function SideNav() {
           type="button"
           onClick={() => setCreateGroupOpen(true)}
           title="Create Group"
-          className={`flex items-center gap-3 rounded-xl py-2 font-dm-sans text-sm font-semibold transition-colors ${
+          className={`flex items-center gap-3 rounded-xl py-2 font-dm-sans text-sm transition-colors ${
             collapsed ? "justify-center px-0" : "px-4"
           } text-muted hover:bg-border/50 hover:text-primary`}
         >
@@ -418,7 +323,7 @@ export default function SideNav() {
           type="button"
           onClick={() => setJoinGroupOpen(true)}
           title="Join Group"
-          className={`flex items-center gap-3 rounded-xl py-2 font-dm-sans text-sm font-semibold transition-colors ${
+          className={`flex items-center gap-3 rounded-xl py-2 font-dm-sans text-sm transition-colors ${
             collapsed ? "justify-center px-0" : "px-4"
           } text-muted hover:bg-border/50 hover:text-primary`}
         >
@@ -428,7 +333,7 @@ export default function SideNav() {
       </nav>
       {!collapsed && (
         <div className="mt-6 px-6">
-          <span className="font-dm-sans text-xs font-bold uppercase tracking-wide text-muted">
+          <span className="font-dm-sans text-xs uppercase tracking-wide text-muted">
             Management
           </span>
         </div>
@@ -438,7 +343,7 @@ export default function SideNav() {
           href="/groups"
           onClick={() => setMobileOpen(false)}
           title="Groups"
-          className={`flex items-center rounded-xl py-3 font-dm-sans text-sm font-semibold transition-colors ${
+          className={`flex items-center rounded-xl py-3 font-dm-sans text-sm transition-colors ${
             collapsed ? "justify-center px-0" : "justify-between px-4"
           } ${
             pathname.startsWith("/groups")
@@ -464,7 +369,7 @@ export default function SideNav() {
                     scrollToSection(sub.id);
                     setMobileOpen(false);
                   }}
-                  className={`cursor-pointer rounded-lg py-1.5 pl-2 text-left font-dm-sans text-sm font-semibold transition-colors ${
+                  className={`cursor-pointer rounded-lg py-1.5 pl-2 text-left font-dm-sans text-sm transition-colors ${
                     isSubActive
                       ? "text-secondary"
                       : "text-muted hover:text-primary"
@@ -482,7 +387,7 @@ export default function SideNav() {
         type="button"
         onClick={() => setConfirmOpen(true)}
         title="Logout"
-        className={`mt-auto flex items-center gap-3 py-5 font-dm-sans text-sm font-semibold text-muted transition-colors hover:text-red-500 ${
+        className={`mt-auto flex items-center gap-3 py-5 font-dm-sans text-sm text-muted transition-colors hover:text-red-500 ${
           collapsed ? "justify-center px-0" : "px-7"
         }`}
       >
@@ -493,7 +398,7 @@ export default function SideNav() {
         type="button"
         onClick={() => setCollapsed((prev) => !prev)}
         title={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-        className="hidden items-center justify-center border-t border-border py-3 font-dm-sans text-xs font-semibold text-muted transition-colors hover:text-primary md:flex"
+        className="hidden items-center justify-center border-t border-border py-3 font-dm-sans text-xs text-muted transition-colors hover:text-primary md:flex"
       >
         {collapsed ? (
           <PanelLeftOpen className="h-4 w-4" />
@@ -548,21 +453,6 @@ export default function SideNav() {
       <JoinGroupModal
         open={joinGroupOpen}
         onClose={() => setJoinGroupOpen(false)}
-      />
-      <CommitmentOptionsModal
-        open={commitmentOptionsOpen}
-        onClose={() => setCommitmentOptionsOpen(false)}
-        onSelect={(type) => {
-          setCommitmentType(type);
-          setCommitmentOptionsOpen(false);
-          setCommitmentOpen(true);
-        }}
-      />
-      <CommitmentModal
-        open={commitmentOpen}
-        type={commitmentType}
-        evaluationTime={evaluationTime}
-        onClose={() => setCommitmentOpen(false)}
       />
       </aside>
     </>
