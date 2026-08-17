@@ -137,6 +137,16 @@ export default function CommitmentCard() {
         }
       }
 
+      const statusRank: Record<string, number> = {
+        submitted: 0,
+        pending: 1,
+        missed: 2,
+      };
+
+      active.sort(
+        (a, b) => (statusRank[a.status] ?? 1) - (statusRank[b.status] ?? 1)
+      );
+
       setItems(active);
       setArchivedItems(archived);
       setScheduledItems(scheduled);
